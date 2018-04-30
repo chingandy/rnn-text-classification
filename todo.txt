@@ -1,0 +1,8 @@
+- background -> look up papers tackling same/similar problems, summarize the findings in those papers and the general state-of-the-art when it comes to character-level RNN
+- theory -> write about the architecture of RNNs and LSTMs, how and when they are used and how they work
+- code -> change pytorch tutorial to work with new data set
+- extension -> change code to work with LSTM
+- extension -> change code to work with GRU
+- extension -> try more hidden layers
+
+
