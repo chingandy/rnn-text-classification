@@ -71,15 +71,21 @@ def build_dict():
             if country == "country":
                 continue
 
+            ascii_name = unicodeToAscii(city)
+
             if country not in all_categories:
                 if len(old_country) > 0:
                     country_dict[old_country]=temp_list
                 old_country=country
+
                 all_categories.append(country)
                 temp_list=[]
-                temp_list.append(unicodeToAscii(city))
+
+                if(len(ascii_name) > 0):
+                    temp_list.append(ascii_name)
             else:
-                temp_list.append(unicodeToAscii(city))
+                if(len(ascii_name) > 0):
+                    temp_list.append(ascii_name)
         
         # last country
         country_dict[old_country] = temp_list
@@ -91,7 +97,7 @@ def build_dict():
 
 country_dict, all_categories, n_categories = build_dict()
 print("number of categories:", n_categories)
-display_distribution(all_categories, country_dict)
+# display_distribution(all_categories, country_dict)
 
 print(country_dict['Vietnam'])
 # print(num, 'num')
@@ -102,5 +108,15 @@ print(country_dict['Vietnam'])
 
 line = lineToTensor(country_dict['Vietnam'][0])
 
-print(line)
+# print(line)
 print(line.shape)
+
+print(country_dict['Macedonia']) 
+
+# print(country_dict['Vietnam'])
+
+for country in all_categories:
+    for city in country_dict[country]:
+        line=lineToTensor(city);
+        if(line.size()==0):
+            print(city)
