@@ -14,6 +14,8 @@ from math import sqrt
 all_letters = string.ascii_letters + " .,;'-"
 n_letters = len(all_letters)
 
+print('n letters', n_letters)
+
 # taken from "Classifying Names with a Character-Level RNN" pytorch tutorial
 # Turn a Unicode string to plain ASCII, thanks to http://stackoverflow.com/a/518232/2809427
 def unicode_to_ascii(s):
