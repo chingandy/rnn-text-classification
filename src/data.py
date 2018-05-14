@@ -9,7 +9,9 @@ import unicodedata
 
 import torch
 
-from math import sqrt
+from math import sqrt, ceil
+
+np.random.seed(0) 
 
 all_letters = string.ascii_letters + " .,;'-"
 n_letters = len(all_letters)
@@ -59,9 +61,9 @@ def display_distribution(all_categories, country_dict):
     plt.show()
 
 
-def build_dict():
+def build_dict_world_cities():
 
-    # Build dictionary with city/country pairs
+    # Build dictionary with city/country pairs - world-cities data set
     country_dict = {}
     all_categories = []
     old_country = ""
@@ -99,49 +101,142 @@ def build_dict():
     return country_dict, all_categories, n_categories
 
 
+def build_dict_geonames():
+    # Build dictionary with city/country pairs - geonames data set
+    country_dict = {}
+    all_categories = []
+    old_country = ""
+    temp_list = []
+    with open('../data/cities1000.txt') as f:
+        for line in f:
+            a=line.split('\t')
+            country=a[8]
+            city=a[2]
+            if country not in all_categories:
+                if len(old_country) > 0:
+                    country_dict[old_country]=temp_list
+                old_country=country
+                all_categories.append(country)
+                temp_list=[]
 
-country_dict, all_categories, n_categories = build_dict()
-print("number of categories:", n_categories)
+            if(len(city) > 0):
+                temp_list.append(city)
+        # last country
+        country_dict[old_country] = temp_list
+    n_categories = len(all_categories)
+
+    # Build dictionary with geonames country code/country name pairs
+    code_dict = {}
+    with open('../data/countryInfo.txt') as f:
+        for line in f:
+            a=line.split('\t')
+            code=a[0]
+            countryname=a[4]
+            code_dict[code]=countryname
+
+    return country_dict, all_categories, n_categories, code_dict
+
+
+def partition_data():
+
+    numtrain=ceil(0.6 * tot) # assume tot is known and is a global sample
+    numval=ceil(0.2 * tot)
+    numtest=tot-numtrain-numval
+    train_set = {}
+    val_set = {}
+    test_set = {}
+
+    tot_test=0
+    tot_val=0
+    tot_train=0
+    for category in all_categories:
+        cities=country_dict[category]
+        np.random.shuffle(cities)
+        temptot=len(cities)
+        endtrain=ceil(0.7 * temptot)
+        endval=ceil(0.7 * temptot) + ceil(0.2 * temptot)
+        endtest=temptot
+
+        print(category, endtrain, (endval-endtrain), (endtest-endval), \
+            endtrain + (endval-endtrain) + (endtest-endval), temptot)
+
+        tot_test += (endtest-endval)
+        tot_val += (endval - endtrain)
+        tot_train += endtrain
+
+        if endtrain > 0:
+            train_set[category] = cities[0:endtrain]
+        if endval > 0:
+            val_set[category] = cities[endtrain:endval]
+        if endval < endtest:
+            test_set[category] = cities[endval:endtest]
+
+
+    # print how many samples there are in the training, validation and test
+    # set respectively
+    print('tot train', tot_train, 'tot val', tot_val, 'tot test', tot_test)
+
+    return train_set, val_set, test_set, tot_train, tot_val, tot_test
+
+country_dict, all_categories, n_categories, code_dict = build_dict_geonames()
+
 # display_distribution(all_categories, country_dict)
 
-print(country_dict['Vietnam'])
-line = line_to_tensor(country_dict['Vietnam'][0])
-print(line.shape)
-print(country_dict['Macedonia']) 
+
+# for country in all_categories:
+#     for city in country_dict[country]:
+#         line=line_to_tensor(city);
+#         if(line.size()==0):
+#             print(city)
 
 
-for country in all_categories:
-    for city in country_dict[country]:
-        line=line_to_tensor(city);
-        if(line.size()==0):
-            print(city)
-
-
-# only keeping countries with at least 100 cities -> this will amount to 40 categories
+# only keeping countries with at least 300 cities -> this will amount to 55 categories (for geonames data set)
 big_country_dict={}
 big_all_cats = []
-
+tot=0
+totfiltered=0
 for country in all_categories:
-    if(len(country_dict[country]) > 100):
+    tot += len(country_dict[country])
+    if(len(country_dict[country]) > 300):
         big_all_cats.append(country)
         big_country_dict[country] = country_dict[country]
+        totfiltered+=len(big_country_dict[country])
+
+print('num samples', tot, 'num samples after filtering', totfiltered)
+
+print('remaining categories after filtering')
+for idx, country in enumerate(big_all_cats):
+    print('(' + country + ',' + code_dict[country] + ')') if(idx==len(big_all_cats)-1) else print('(' + country + ',' + code_dict[country] + ')', end=', ')
+
 
 n_categories = len(big_all_cats)
+print("number of categories:", n_categories)
 
-# creating weight vector to handle unbalanced training set
-num = [] # counts number of cities for each country
-index=0
-for country in big_all_cats:
-    num.append(len(big_country_dict[country]))
+# # creating weight vector to handle unbalanced training set
+# num = [] # counts number of cities for each country
+# index=0
+# for country in big_all_cats:
+#     num.append(len(big_country_dict[country]))
 
-mx = np.max(num)
-class_weights = []
-for n in num:
-    class_weights.append(int(mx/n))
-class_weights=torch.FloatTensor(class_weights)
+# mx = np.max(num)
+# class_weights = []
+# for n in num:
+#     class_weights.append(int(mx/n))
+# class_weights=torch.FloatTensor(class_weights)
 
 
 # comment this (and comment awaycreation of class_weights vector abovee) if you want to run on ~all~ the data
 all_categories=big_all_cats
 country_dict=big_country_dict
+
+
+train_set, val_set, test_set, tot_train, tot_val, tot_test = partition_data()
+
+
+
+# print('train', train_set, len(train_set))
+# print('val', val_set, len(val_set))
+# print('test', test_set, len(test_set))
+
+
 
