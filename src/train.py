@@ -30,16 +30,6 @@ def random_training_pair(current_dict):
     line_tensor = Variable(line_to_tensor(line))
     return category, line, category_tensor, line_tensor
 
-def random_training_pair_without_replacement(current_dict, categories):
-    category = random.choice(categories)
-    # print(current_dict[category])
-    line = random.choice(current_dict[category])
-    current_dict[category].remove(line) # remove line from dict
-
-
-    category_tensor = Variable(torch.LongTensor([categories.index(category)]))
-    line_tensor = Variable(line_to_tensor(line))
-    return category, line, category_tensor, line_tensor
 
 def size_dict(current_dict):
     num=0
@@ -128,6 +118,54 @@ def train_model(title, file_name):
 
 
     torch.save(rnn, file_name) # save model
+
+def train_model_deterministic(title, file_name):
+    
+    # instead of randomly sampling data points, go through entire data set every epoch
+    print(rnn)
+    # Keep track of losses for plotting
+    current_loss = 0
+    all_losses = []
+    start = time.time()
+
+    for epoch in range(1, n_epochs + 1):
+
+        for num in range(0, tot_train):
+
+            category=y_train[num]
+            line=X_train[num]
+            category_tensor=Variable(torch.LongTensor([all_categories.index(category)]))
+            line_tensor=Variable(line_to_tensor(line))
+
+            output, loss = rnn.train(category_tensor, line_tensor)
+            current_loss += loss
+
+            # Print epoch number, loss, name and guess
+            if num % print_every == 0:
+                guess, guess_i = category_from_output(output)
+                correct = '✓' if guess == category else '✗ (%s)' % code_dict[category]                
+                print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, epoch / n_epochs * 100, time_since(start), loss, line, code_dict[guess], correct))
+        
+                # just printing the sum of the weights to check that theyre not exploding or vanishing
+                print(np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy())) 
+        
+            # Add current loss avg to list of losses
+            if num % plot_every == 0:
+                all_losses.append(current_loss / plot_every)
+                current_loss = 0
+
+    # plot all losses
+    plt.figure()
+
+    plt.plot(np.arange(0, n_epochs, plot_every), all_losses)
+    plt.title(title)
+    plt.xlabel('epoch')
+    plt.ylabel('cost')
+    plt.show()
+
+    torch.save(rnn, file_name) # save model
+
+
 
 
 if __name__ == '__main__':

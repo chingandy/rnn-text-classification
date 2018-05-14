@@ -107,6 +107,8 @@ def build_dict_geonames():
     all_categories = []
     old_country = ""
     temp_list = []
+    # X=[]
+    # y=[]
     with open('../data/cities1000.txt') as f:
         for line in f:
             a=line.split('\t')
@@ -120,6 +122,8 @@ def build_dict_geonames():
                 temp_list=[]
 
             if(len(city) > 0):
+                # X.append(city)
+                # y.append(country)
                 temp_list.append(city)
         # last country
         country_dict[old_country] = temp_list
@@ -134,12 +138,12 @@ def build_dict_geonames():
             countryname=a[4]
             code_dict[code]=countryname
 
-    return country_dict, all_categories, n_categories, code_dict
+    return country_dict, all_categories, n_categories, code_dict #, X, y
 
 
 def partition_data():
 
-    numtrain=ceil(0.6 * tot) # assume tot is known and is a global sample
+    numtrain=ceil(0.6 * tot) # assume tot is known and is a global variable
     numval=ceil(0.2 * tot)
     numtest=tot-numtrain-numval
     train_set = {}
@@ -178,16 +182,49 @@ def partition_data():
 
     return train_set, val_set, test_set, tot_train, tot_val, tot_test
 
-country_dict, all_categories, n_categories, code_dict = build_dict_geonames()
+def partition_x_y():
+
+    X_train, y_train, X_val, y_val, X_test, y_test = [], [], [], [], [], []
+    for country in train_set:
+        cities=train_set[country]
+        for city in cities:
+            X_train.append(city)
+            y_train.append(country)
+
+    for country in val_set:
+        cities=val_set[country]
+        for city in cities:
+            X_val.append(city)
+            y_val.append(country)
+
+    for country in test_set:
+        cities=test_set[country]
+        for city in cities:
+            X_test.append(city)
+            y_test.append(country)            
+
+    tot_tr=np.concatenate((np.expand_dims(X_train, axis=1), np.expand_dims(y_train, axis=1)), axis=1)
+    np.random.shuffle(tot_tr)
+    X_train=tot_tr[:, 0]
+    y_train=tot_tr[:, 1]
+
+    tot_tr=np.concatenate((np.expand_dims(X_test, axis=1), np.expand_dims(y_test, axis=1)), axis=1)
+    np.random.shuffle(tot_tr)
+    X_test=tot_tr[:, 0]
+    y_test=tot_tr[:, 1]
+
+    tot_tr=np.concatenate((np.expand_dims(X_val, axis=1), np.expand_dims(y_val, axis=1)), axis=1)
+    np.random.shuffle(tot_tr)
+    X_val=tot_tr[:, 0]
+    y_val=tot_tr[:, 1]
+
+    return X_train, y_train, X_val, y_val, X_test, y_test
+
+
+country_dict, all_categories, n_categories, code_dict  = build_dict_geonames()
 
 # display_distribution(all_categories, country_dict)
 
-
-# for country in all_categories:
-#     for city in country_dict[country]:
-#         line=line_to_tensor(city);
-#         if(line.size()==0):
-#             print(city)
 
 
 # only keeping countries with at least 300 cities -> this will amount to 55 categories (for geonames data set)
@@ -195,12 +232,17 @@ big_country_dict={}
 big_all_cats = []
 tot=0
 totfiltered=0
+X=[]
+y=[]
 for country in all_categories:
     tot += len(country_dict[country])
     if(len(country_dict[country]) > 300):
         big_all_cats.append(country)
         big_country_dict[country] = country_dict[country]
         totfiltered+=len(big_country_dict[country])
+
+        X.append(country_dict[country])
+        y.append(country)
 
 print('num samples', tot, 'num samples after filtering', totfiltered)
 
@@ -213,16 +255,16 @@ n_categories = len(big_all_cats)
 print("number of categories:", n_categories)
 
 # creating weight vector to handle unbalanced training set
-# num = [] # counts number of cities for each country
-# index=0
-# for country in big_all_cats:
-#     num.append(len(big_country_dict[country]))
+num = [] # counts number of cities for each country
+index=0
+for country in big_all_cats:
+    num.append(len(big_country_dict[country]))
 
-# mx = np.max(num)
-# class_weights = []
-# for n in num:
-#     class_weights.append(int(mx/n))
-# class_weights=torch.FloatTensor(class_weights)
+mx = np.max(num)
+class_weights = []
+for n in num:
+    class_weights.append(int(mx/n))
+class_weights=torch.FloatTensor(class_weights)
 
 
 # comment this (and comment awaycreation of class_weights vector abovee) if you want to run on ~all~ the data
@@ -240,3 +282,4 @@ train_set, val_set, test_set, tot_train, tot_val, tot_test = partition_data()
 
 
 
+X_train, y_train, X_val, y_val, X_test, y_test = partition_x_y()
