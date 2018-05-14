@@ -212,7 +212,7 @@ for idx, country in enumerate(big_all_cats):
 n_categories = len(big_all_cats)
 print("number of categories:", n_categories)
 
-# # creating weight vector to handle unbalanced training set
+# creating weight vector to handle unbalanced training set
 # num = [] # counts number of cities for each country
 # index=0
 # for country in big_all_cats:

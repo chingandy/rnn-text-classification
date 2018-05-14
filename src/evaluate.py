@@ -2,10 +2,11 @@
 import torch
 from data import *
 from model import *
-from train import random_training_pair, category_from_output
+from train import random_training_pair, category_from_output #, accuracy
 
 import matplotlib.ticker as ticker
 import sys
+import math
 
 rnn=0
 
@@ -18,15 +19,29 @@ def confusion_matrix():
 
     # Go through a bunch of examples and record which are correctly guessed
     for i in range(n_confusion):
-        category, line, category_tensor, line_tensor = random_training_pair()
+        category, line, category_tensor, line_tensor = random_training_pair(test_set)
         output = rnn.evaluate(line_tensor)
         guess, guess_i = category_from_output(output)
         category_i = all_categories.index(category)
         confusion[category_i][guess_i] += 1
 
     # Normalize by dividing every row by its sum
+    precision=0 # precision=true positive/(true positive + false negative)=true positive/sum(actual category)
+    recall=0  # recall=true positive/(true positive+false positive) = true positive / sum(predicted as category)
+    avg_f1=0
+    print('precision\trecall\t\tf1 score\tcategory')
     for i in range(n_categories):
+        precision=confusion[i][i] / confusion[i].sum()
+        recall=confusion[i][i] / confusion[:, i].sum()
+        f1=2*(precision*recall)/(precision+recall)
+        avg_f1 += 0 if math.isnan(f1) else f1
+
+        print('%.4f\t\t%.4f\t\t%.4f\t\t%s' % (precision.data.numpy(), recall.data.numpy(), f1.data.numpy(), code_dict[all_categories[i]]))
+
         confusion[i] = confusion[i] / confusion[i].sum()
+
+    print('average f1 score', avg_f1.data.numpy()/n_categories)
+
 
     # Set up plot
     fig = plt.figure()
@@ -44,6 +59,27 @@ def confusion_matrix():
 
     plt.show()
 
+def accuracy(curr_set):
+    correct=0
+    tot=0
+
+    for num in range(0, 1000):
+        category, line, category_tensor, line_tensor = random_training_pair(curr_set)
+        output = rnn.evaluate(line_tensor)
+        guess, guess_i = category_from_output(output)
+        category_i=all_categories.index(category)
+        if category_i==guess_i:
+            correct+=1
+        tot+=1
+
+    acc=(correct/tot)
+    return acc
+
+def test_accuracy():
+    train_acc=accuracy(train_set)
+    test_acc=accuracy(test_set)
+    print('train accuracy =', train_acc * 100, '%' , 'test accuracy =', test_acc * 100, '%')
+
 
 
 if __name__ == '__main__':
@@ -60,10 +96,11 @@ if __name__ == '__main__':
         rnn = torch.load('model.pt')
     elif(model_type=='LSTM'):
         global rnn
-        rnn = torch.load('LSTM_model.pt')
+        rnn = torch.load('LSTM_model_4.pt')
     else:
         print('input: model type (either RNN or LSTM)')
         quit()
 
 
     confusion_matrix()
+    test_accuracy()

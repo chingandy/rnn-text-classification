@@ -13,7 +13,7 @@ import fileinput
 import sys
 
 n_hidden = 128
-n_epochs = 2
+n_epochs = 100000
 print_every = 1000
 plot_every = 1000
 learning_rate = 0.005 # If you set this too high, it might explode. If too low, it might not learn
@@ -22,9 +22,6 @@ def category_from_output(output):
     top_n, top_i = output.data.topk(1) # Tensor out of Variable with .data
     category_i = top_i[0][0]
     return all_categories[category_i], category_i
-
-# def random_choice(l):
-#     return l[random.randint(0, len(l) - 1)]
 
 def random_training_pair(current_dict):
     category = random.choice(all_categories)
@@ -77,88 +74,58 @@ def time_since(since):
 
 rnn=0
 
-def train_model(file_name):
+def train_model(title, file_name):
 
     print(rnn)
     # Keep track of losses for plotting
     current_loss = 0
-    all_losses = []
+    current_loss_val = 0
+
+    all_losses_train = []
+    all_losses_val = []
 
     start = time.time()
 
     for epoch in range(1, n_epochs + 1):
 
-        category, line, category_tensor, line_tensor = random_training_pair()
-
+        category, line, category_tensor, line_tensor = random_training_pair(train_set)
         output, loss = rnn.train(category_tensor, line_tensor)
         current_loss += loss
+
+        _, _, category_tensor, line_tensor = random_training_pair(val_set)
+        out = rnn.evaluate(line_tensor)
+        loss = rnn.criterion(out, category_tensor)
+        current_loss_val += loss
 
         # Print epoch number, loss, name and guess
         if epoch % print_every == 0:
             guess, guess_i = category_from_output(output)
-            correct = '✓' if guess == category else '✗ (%s)' % category
-            print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, epoch / n_epochs * 100, time_since(start), loss, line, guess, correct))
+            correct = '✓' if guess == category else '✗ (%s)' % code_dict[category]
+            print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, epoch / n_epochs * 100, time_since(start), loss, line, code_dict[guess], correct))
 
             # just printing the sum of the weights to check that theyre not exploding or vanishing
-            # print(np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight_ih_l0.data.numpy())) 
+            print(np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy())) 
         
         # Add current loss avg to list of losses
         if epoch % plot_every == 0:
-            all_losses.append(current_loss / plot_every)
+            all_losses_train.append(current_loss / plot_every)
+            all_losses_val.append(current_loss_val / plot_every)
             current_loss = 0
+            current_loss_val=0
 
 
     # plot all losses
     plt.figure()
-    plt.plot(all_losses)
-    plt.show()
 
-    torch.save(rnn, file_name) # save model
-
-def train_model_deterministic(title, file_name):
-    # instead of randomly sampling data points, go through entire data set
-
-    print(rnn)
-    # Keep track of losses for plotting
-    current_loss = 0
-    all_losses = []
-    start = time.time()
-    for epoch in range(1, n_epochs + 1):
-        c=copy.deepcopy(train_set)
-        categories=all_categories
-        for num in range(0, tot_train-1):
-            category, line, category_tensor, line_tensor = random_training_pair_without_replacement(c, categories)
-
-            if c[category] == []:
-                print('removing cat')
-                categories.remove(category)
-
-            output, loss = rnn.train(category_tensor, line_tensor)
-            current_loss += loss
-
-
-            # Print epoch number, loss, name and guess
-            if num % print_every == 0:
-                guess, guess_i = category_from_output(output)
-                correct = '✓' if guess == category else '✗ (%s)' % code_dict[category]     
-                print('%d %d %d%% (%s) %.4f %s / %s %s' % (epoch, num, num / (tot_train * n_epochs) * 100, time_since(start), loss, line, code_dict[guess], correct))
-        
-                # just printing the sum of the weights to check that theyre not exploding or vanishing
-                print(np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy())) 
-        
-            # Add current loss avg to list of losses
-            if num % plot_every == 0:
-                all_losses.append(current_loss / plot_every)
-                current_loss = 0
-
-    # plot all losses
-    plt.figure()
-
-    plt.plot(np.arange(0, n_epochs * plot_every, plot_every), all_losses)
+    plt.plot(np.arange(0, n_epochs, plot_every), all_losses_train, label="train loss")
+    plt.plot(np.arange(0, n_epochs, plot_every), all_losses_val, label="val loss")
+    np.save('train_error_LSTM_model_5.npy', all_losses_train)
     plt.title(title)
     plt.xlabel('epoch')
     plt.ylabel('cost')
+    plt.legend(loc=1)
     plt.show()
+
 
     torch.save(rnn, file_name) # save model
 
@@ -182,7 +149,7 @@ if __name__ == '__main__':
     elif(model_type=='LSTM'):
         global rnn
         rnn = RNN_LSTM(n_letters, n_hidden, n_categories)
-        file_name='LSTM_model.pt'
+        file_name='LSTM_model_5.pt'
         title = 'LSTM model'
     else:
         print('input: model type (either RNN or LSTM)')
@@ -190,9 +157,9 @@ if __name__ == '__main__':
 
 
     rnn.optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
-    rnn.criterion = nn.NLLLoss(weight=class_weights)
+    rnn.criterion = nn.NLLLoss()
 
-    # train_model(file_name)
-    train_model_deterministic(title, file_name)
+    train_model(title, file_name)
+    # train_model_deterministic(title, file_name)
 
 
