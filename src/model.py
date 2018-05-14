@@ -10,12 +10,14 @@ class RNN(nn.Module):
 
         self.i2h = nn.Linear(input_size + hidden_size, hidden_size)
         self.i2o = nn.Linear(input_size + hidden_size, output_size)
+        self.tanh = nn.Tanh(dim=1)
         self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, input, hidden):
         combined = torch.cat((input, hidden), 1)
         hidden = self.i2h(combined)
         output = self.i2o(combined)
+        output = self.tanh(output)
         output = self.softmax(output)
         return output, hidden
 
@@ -24,7 +26,7 @@ class RNN(nn.Module):
 
     def train(self, category_tensor, line_tensor):
         hidden = self.init_hidden()
-        
+
         self.optimizer.zero_grad()
 
         for i in range(line_tensor.size()[0]):
@@ -42,10 +44,10 @@ class RNN(nn.Module):
     # Just return an output given a line
     def evaluate(self, line_tensor):
         hidden = self.init_hidden()
-        
+
         for i in range(line_tensor.size()[0]):
             output, hidden = self(line_tensor[i], hidden)
-        
+
         return output
 
 
@@ -93,7 +95,5 @@ class RNN_LSTM(nn.Module):
         line_tensor.unsqueeze_(1)
         for i in range(line_tensor.size()[0]):
             output, hidden, cell = self(line_tensor[i], hidden, cell)
-        
+
         return output
-
-
