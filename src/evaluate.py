@@ -9,13 +9,13 @@ import sys
 import math
 
 rnn=0
+np.random.seed(0) 
 
 def confusion_matrix():
 
     # Keep track of correct guesses in a confusion matrix
     confusion = torch.zeros(n_categories, n_categories)
     n_confusion = 10000 # how many samples will be looked at 
-
 
     # Go through a bunch of examples and record which are correctly guessed
     for i in range(n_confusion):
@@ -25,7 +25,6 @@ def confusion_matrix():
         category_i = all_categories.index(category)
         confusion[category_i][guess_i] += 1
 
-    # Normalize by dividing every row by its sum
     precision=0 # precision=true positive/(true positive + false negative)=true positive/sum(actual category)
     recall=0  # recall=true positive/(true positive+false positive) = true positive / sum(predicted as category)
     avg_f1=0
@@ -36,11 +35,16 @@ def confusion_matrix():
         f1=2*(precision*recall)/(precision+recall)
         avg_f1 += 0 if math.isnan(f1) else f1
 
+        print('num of this category', confusion[i].sum().data.numpy(), \
+        'num predictions of this category', confusion[:,i].sum().data.numpy())
         print('%.4f\t\t%.4f\t\t%.4f\t\t%s' % (precision.data.numpy(), recall.data.numpy(), f1.data.numpy(), code_dict[all_categories[i]]))
 
-        confusion[i] = confusion[i] / confusion[i].sum()
 
     print('average f1 score', avg_f1.data.numpy()/n_categories)
+
+    # Normalize by dividing every row by its sum
+    for i in range(n_categories):
+        confusion[i] = confusion[i] / confusion[i].sum()
 
 
     # Set up plot
@@ -96,7 +100,7 @@ if __name__ == '__main__':
         rnn = torch.load('model.pt')
     elif(model_type=='LSTM'):
         global rnn
-        rnn = torch.load('LSTM_model_4.pt')
+        rnn = torch.load('LSTM_model_5.pt')
     else:
         print('input: model type (either RNN or LSTM)')
         quit()
