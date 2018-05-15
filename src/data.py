@@ -221,10 +221,10 @@ def partition_x_y():
     return X_train, y_train, X_val, y_val, X_test, y_test
 
 
+# country_dict, all_categories, n_categories = build_dict_world_cities()
 country_dict, all_categories, n_categories, code_dict  = build_dict_geonames()
 
 # display_distribution(all_categories, country_dict)
-
 
 
 # only keeping countries with at least 300 cities -> this will amount to 55 categories (for geonames data set)
@@ -232,17 +232,13 @@ big_country_dict={}
 big_all_cats = []
 tot=0
 totfiltered=0
-X=[]
-y=[]
+
 for country in all_categories:
     tot += len(country_dict[country])
     if(len(country_dict[country]) > 300):
         big_all_cats.append(country)
         big_country_dict[country] = country_dict[country]
         totfiltered+=len(big_country_dict[country])
-
-        X.append(country_dict[country])
-        y.append(country)
 
 print('num samples', tot, 'num samples after filtering', totfiltered)
 
@@ -271,15 +267,8 @@ class_weights=torch.FloatTensor(class_weights)
 all_categories=big_all_cats
 country_dict=big_country_dict
 
-
 train_set, val_set, test_set, tot_train, tot_val, tot_test = partition_data()
+X_train, y_train, X_val, y_val, X_test, y_test = partition_x_y() # for "train_model_deterministic"
 
 
 
-# print('train', train_set, len(train_set))
-# print('val', val_set, len(val_set))
-# print('test', test_set, len(test_set))
-
-
-
-X_train, y_train, X_val, y_val, X_test, y_test = partition_x_y()

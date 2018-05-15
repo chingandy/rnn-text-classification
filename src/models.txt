@@ -7,11 +7,12 @@ LSTM_model_4.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	12
 LSTM_model_5.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			yes			no				1			24m			yes
 LSTM_model_6.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			no				2			22m			yes
 LSTM_model_7.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			yes				2			121m		no	
-
+LSTM_model_7.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			yes				2			121m		no	
+LSTM_model_8.pt 	LSTM 	100 000 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2						no
 
 evaluation
 
-name 				avg f1-score	train acc		test acc	(on 10 000 samples)
+name 				avg f1-score	train acc		test acc	(on 10 000 samples)		
 model.pt
 LSTM_model.pt 		0.18			21.6
 LSTM_model_2.pt 	0.2				21.9
@@ -31,3 +32,4 @@ LSTM_model_4.pt 	-	more filtered data
 LSTM_model_5.pt 	-	no class weights
 LSTM_model_6.pt 	-	two LSTM layers
 LSTM_model_7.pt 	-	no random sampling - run through whole training set every epoch
+LSTM_model_8.pt 	-	check error on validation set to protect against overfitting  (also introduced shuffling the data between every epoch)

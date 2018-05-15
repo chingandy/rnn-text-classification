@@ -7,6 +7,7 @@ from train import random_training_pair, category_from_output #, accuracy
 import matplotlib.ticker as ticker
 import sys
 import math
+torch.nn.Module.dump_patches = True
 
 rnn=0
 np.random.seed(0) 
@@ -37,7 +38,7 @@ def confusion_matrix():
 
         print('num of this category', confusion[i].sum().data.numpy(), \
         'num predictions of this category', confusion[:,i].sum().data.numpy())
-        print('%.4f\t\t%.4f\t\t%.4f\t\t%s' % (precision.data.numpy(), recall.data.numpy(), f1.data.numpy(), code_dict[all_categories[i]]))
+        print('%.4f\t\t%.4f\t\t%.4f\t\t%s' % (precision.data.numpy(), recall.data.numpy(), f1.data.numpy(), all_categories[i]))
 
 
     print('average f1 score', avg_f1.data.numpy()/n_categories)
@@ -80,8 +81,8 @@ def accuracy(curr_set):
     return acc
 
 def test_accuracy():
-    train_acc=accuracy(train_set)
-    test_acc=accuracy(test_set)
+    train_acc=accuracy(country_dict)
+    test_acc=accuracy(country_dict)
     print('train accuracy =', train_acc * 100, '%' , 'test accuracy =', test_acc * 100, '%')
 
 
@@ -100,7 +101,7 @@ if __name__ == '__main__':
         rnn = torch.load('model.pt')
     elif(model_type=='LSTM'):
         global rnn
-        rnn = torch.load('LSTM_model_5.pt')
+        rnn = torch.load('LSTM_model_7.pt')
     else:
         print('input: model type (either RNN or LSTM)')
         quit()
