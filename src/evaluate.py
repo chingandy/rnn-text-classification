@@ -1,4 +1,3 @@
-
 import torch
 from data import *
 from model import *
@@ -7,7 +6,7 @@ from train import random_training_pair, category_from_output
 import matplotlib.ticker as ticker
 import sys
 
-rnn=0
+#rnn=0
 
 def confusion_matrix():
 
@@ -49,20 +48,23 @@ def confusion_matrix():
 if __name__ == '__main__':
 
     if(len(sys.argv) < 2):
-        print('usage: train.py <model name>, where <model name> is either RNN or LSTM')
+        print('usage: evaluate.py <model name>, where <model name> is either RNN or LSTM or GRU')
         quit()
 
     model_type = str(sys.argv[1])
 
     print(model_type)
     if(model_type=="RNN"):
-        global rnn
+        #global rnn
         rnn = torch.load('model.pt')
     elif(model_type=='LSTM'):
-        global rnn
+        #global rnn
         rnn = torch.load('LSTM_model.pt')
+    elif(model_type=="GRU"):
+        #global rnn
+        rnn = torch.load('grumodel.pt')
     else:
-        print('input: model type (either RNN or LSTM)')
+        print('input: model type (either RNN or LSTM or GRU)')
         quit()
 
 

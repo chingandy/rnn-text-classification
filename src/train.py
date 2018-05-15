@@ -12,19 +12,19 @@ import matplotlib.ticker as ticker
 import fileinput
 import sys
 
+
 n_hidden = 128
-n_epochs = 2
+n_epochs = 10
 print_every = 1000
+n_epochs = 100000
 plot_every = 1000
 learning_rate = 0.005 # If you set this too high, it might explode. If too low, it might not learn
+n_layers=1
 
 def category_from_output(output):
     top_n, top_i = output.data.topk(1) # Tensor out of Variable with .data
     category_i = top_i[0][0]
     return all_categories[category_i], category_i
-
-# def random_choice(l):
-#     return l[random.randint(0, len(l) - 1)]
 
 def random_training_pair(current_dict):
     category = random.choice(all_categories)
@@ -33,16 +33,6 @@ def random_training_pair(current_dict):
     line_tensor = Variable(line_to_tensor(line))
     return category, line, category_tensor, line_tensor
 
-def random_training_pair_without_replacement(current_dict, categories):
-    category = random.choice(categories)
-    # print(current_dict[category])
-    line = random.choice(current_dict[category])
-    current_dict[category].remove(line) # remove line from dict
-
-
-    category_tensor = Variable(torch.LongTensor([categories.index(category)]))
-    line_tensor = Variable(line_to_tensor(line))
-    return category, line, category_tensor, line_tensor
 
 def size_dict(current_dict):
     num=0
@@ -75,7 +65,7 @@ def time_since(since):
     s -= m * 60
     return '%dm %ds' % (m, s)
 
-rnn=0
+#rnn=0
 
 def train_model(file_name):
 
@@ -162,30 +152,36 @@ def train_model_deterministic(title, file_name):
 
     torch.save(rnn, file_name) # save model
 
+#rnn=0
 
 if __name__ == '__main__':
-
+    
     print(str(sys.argv))
 
     if(len(sys.argv) < 2):
-        print('usage: train.py <model name>, where <model name> is either RNN or LSTM')
+        print('usage: train.py <model name>, where <model name> is either RNN or LSTM or GRU')
         quit()
 
     model_type = str(sys.argv[1])
 
     print(model_type)
     if(model_type=="RNN"):
-        global rnn
+        #global rnn
         rnn = RNN(n_letters, n_hidden, n_categories)
         file_name='model.pt'
         title = 'RNN model'
     elif(model_type=='LSTM'):
-        global rnn
+        #global rnn
         rnn = RNN_LSTM(n_letters, n_hidden, n_categories)
         file_name='LSTM_model.pt'
         title = 'LSTM model'
+    elif(model_type=="GRU"):
+        #global rnn
+        rnn = GRU(n_letters, n_hidden, n_categories)
+        title='GRU model'
+        file_name='grumodel.pt'
     else:
-        print('input: model type (either RNN or LSTM)')
+        print('input: model type (either RNN or LSTM or GRU)')
         quit()
 
 

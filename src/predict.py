@@ -2,11 +2,11 @@ from model import *
 from data import *
 import sys
 
-rnn = torch.load('model.pt')
+rnn = torch.load('LSTM_model.pt')
 
 # Just return an output given a line
 def evaluate(line_tensor):
-    hidden = rnn.initHidden()
+    hidden = rnn.init_hidden()
     
     for i in range(line_tensor.size()[0]):
         output, hidden = rnn(line_tensor[i], hidden)
