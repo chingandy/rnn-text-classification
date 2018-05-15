@@ -6,21 +6,20 @@ LSTM_model_3.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>100	12
 LSTM_model_4.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			yes			yes				1						yes
 LSTM_model_5.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			yes			no				1			24m			yes
 LSTM_model_6.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			no				2			22m			yes
-LSTM_model_7.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			yes				2			121m		no	
-LSTM_model_7.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			yes				2			121m		no	
-LSTM_model_8.pt 	LSTM 	100 000 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2						no
+LSTM_model_7.pt  	LSTM 	10			1000			1000		0.005			geonames		countries>300	128			no			yes				2			121m		no	
+LSTM_model_8.pt 	LSTM 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2						no
 
 evaluation
 
-name 				avg f1-score	train acc		test acc	(on 10 000 samples)		
+name 				time taken		avg f1-score	train acc		test acc	(on 10 000 samples)		
 model.pt
-LSTM_model.pt 		0.18			21.6
-LSTM_model_2.pt 	0.2				21.9
-LSTM_model_3.pt 	0.04			6.4				7.5
-LSTM_model_4.pt 	0.14			15				17
-LSTM_model_5.pt 	0.2				20.1			17.2
-LSTM_model_6.pt 	0.1				13.9			12.8
-LSTM_model_7.pt 	0.23			29				27
+LSTM_model.pt 						0.18			21.6
+LSTM_model_2.pt 					0.2				21.9
+LSTM_model_3.pt 					0.04			6.4				7.5
+LSTM_model_4.pt 					0.14			15				17
+LSTM_model_5.pt 	24m				0.2				20.1			17.2
+LSTM_model_6.pt 	22m				0.1				13.9			12.8
+LSTM_model_7.pt 	121m		 	0.23			29				27
 
 
 things that changed for each model:

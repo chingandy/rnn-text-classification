@@ -146,8 +146,8 @@ def train_model_deterministic(title, file_name):
 
         for num in range(1, tot_train + 1):
 
-            category=y_train[num]
-            line=X_train[num]
+            category=y_train[num-1]
+            line=X_train[num-1]
             category_tensor=Variable(torch.LongTensor([all_categories.index(category)]))
             line_tensor=Variable(line_to_tensor(line))
             output, loss = rnn.train(category_tensor, line_tensor)
@@ -180,7 +180,7 @@ def train_model_deterministic(title, file_name):
         val_loss=(val_loss/1000).data.numpy()
         all_losses_val.append(val_loss)
         print('\t%s %d %s %.4f' % ('epoch', epoch, 'val loss', val_loss))
-        if val_loss > old_val_loss[epoch-1]:
+        if val_loss > all_losses_val[epoch-1]:
             print('early stopping')
             break
 
