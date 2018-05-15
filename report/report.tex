@@ -39,6 +39,17 @@ the abstract section}
 % problem and also formally define the problem. (1-2 pages including
 % title, authors and abstract)
 
+We are looking at a text classification problem with short text and character-level classification. The texts we are looking at are names of cities, and the classes are the names of the country the city belongs to. There are circa 240 categories (countries) in the data set, but we will limit the number of categories so as not to make the categories too unevenly distributed (ie remove countries with too few cities in the data set).
+
+We will be using character-level classification. This means that the network processes the input one character at a time. Each character results in an output consisting of the probabilities for each letter for the next character. If we have a 58-character alphabet, the hidden state will consist of the probability of each of those 58 characters for the next letter in the sequence. So for each character, one such prediction is produced, as well as a hidden state, which is fed into the next step.
+
+Short-text classification is hard in that there is less information to go off with little to no grammar or syntax. Some applications of short-text classification include search queries and information retrieval, mapping a product name to its associated product, the classification of titles, questions, sentences, and short messages.
+
+The inspiration for the project is a tutorial in which a recurrent network is used to classify names as belonging to certain nationalities. To start with, the model of that tutorial is to be replicated, then additional architectures will be implemented and compared. Questions we ask ourselves include: to what degree would a deeper network help in this problem? What sort of architectures are good in this application? Would an LSTM-layer in the recurrent network give better results? 
+
+To measure the success of the text classification, we will look at the precision, recall and f1-score of each category in the data set. This because it gives a more nuancued evaluation than accuracy, seeing as how the data set used is heavily skewed. Furthermore, we will visualize the results with a confusion matrix.
+
+
 \section{Background}
 
 % • Background: summarize a few notable approaches/papers tackling
@@ -57,6 +68,8 @@ the abstract section}
 % text description. (1-3 pages)
 
 \section{Experiments}
+
+
 \section{Results}
 \section{Conclusions}
 
