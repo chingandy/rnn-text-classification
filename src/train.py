@@ -13,9 +13,11 @@ import matplotlib.ticker as ticker
 import fileinput
 import sys
 
-n_hidden = 110
+
+n_hidden = 128
 n_epochs = 10
 print_every = 1000
+
 plot_every = 1000
 learning_rate = 0.05 # If you set this too high, it might explode. If too low, it might not learn
 n_layers=1
@@ -64,7 +66,7 @@ def time_since(since):
     s -= m * 60
     return '%dm %ds' % (m, s)
 
-rnn=0
+#rnn=0
 
 def train_model(title, file_name):
 
@@ -253,32 +255,37 @@ def hp_optimization():
 
 
 
-
+#rnn=0
 
 if __name__ == '__main__':
 
-    hp_optimization()
+
+    #hp_optimization()
+
     print(str(sys.argv))
 
     if(len(sys.argv) < 2):
-        print('usage: train.py <model name>, where <model name> is either RNN or LSTM')
+        print('usage: train.py <model name>, where <model name> is either RNN or LSTM or GRU')
         quit()
 
     model_type = str(sys.argv[1])
 
     print(model_type)
     if(model_type=="RNN"):
-        global rnn
+        #global rnn
         rnn = RNN(n_letters, n_hidden, n_categories)
         file_name='model.pt'
         title = 'RNN model'
     elif(model_type=='LSTM'):
-        global rnn
+        #global rnn
         rnn = RNN_LSTM(n_letters, n_hidden, n_layers, n_categories)
-        file_name='LSTM_model_test.pt'
-        title = 'LSTM model'
+        file_name='LSTM_model.pt'
+    elif(model_type=="GRU"):
+        #global rnn
+        rnn = GRU(n_letters, n_hidden, n_categories)
+        file_name='grumodel.pt'
     else:
-        print('input: model type (either RNN or LSTM)')
+        print('input: model type (either RNN or LSTM or GRU)')
         quit()
 
 

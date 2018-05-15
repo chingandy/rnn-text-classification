@@ -68,7 +68,7 @@ def build_dict_world_cities():
     all_categories = []
     old_country = ""
     temp_list = []
-    with open('../data/world-cities_csv.csv', 'r') as f:
+    with open('../data/world-cities_csv.csv', 'r', encoding="utf8") as f:
         reader = csv.reader(f)
         for row in reader:
             city=row[0]
@@ -107,9 +107,7 @@ def build_dict_geonames():
     all_categories = []
     old_country = ""
     temp_list = []
-    # X=[]
-    # y=[]
-    with open('../data/cities1000.txt') as f:
+    with open('../data/cities1000.txt', encoding="utf8") as f:
         for line in f:
             a=line.split('\t')
             country=a[8]
@@ -131,7 +129,7 @@ def build_dict_geonames():
 
     # Build dictionary with geonames country code/country name pairs
     code_dict = {}
-    with open('../data/countryInfo.txt') as f:
+    with open('../data/countryInfo.txt', encoding="utf8") as f:
         for line in f:
             a=line.split('\t')
             code=a[0]
@@ -250,7 +248,8 @@ for idx, country in enumerate(big_all_cats):
 n_categories = len(big_all_cats)
 print("number of categories:", n_categories)
 
-# creating weight vector to handle unbalanced training set
+
+# # creating weight vector to handle unbalanced training set
 num = [] # counts number of cities for each country
 index=0
 for country in big_all_cats:
