@@ -4,6 +4,7 @@ from model import *
 import random
 import time
 import math
+from math import floor
 
 import copy
 import matplotlib.pyplot as plt
@@ -12,11 +13,12 @@ import matplotlib.ticker as ticker
 import fileinput
 import sys
 
-n_hidden = 128
-n_epochs = 20
+n_hidden = 110
+n_epochs = 10
 print_every = 1000
 plot_every = 1000
-learning_rate = 0.005 # If you set this too high, it might explode. If too low, it might not learn
+learning_rate = 0.05 # If you set this too high, it might explode. If too low, it might not learn
+n_layers=1
 
 def category_from_output(output):
     top_n, top_i = output.data.topk(1) # Tensor out of Variable with .data
@@ -71,7 +73,7 @@ def train_model(title, file_name):
     current_loss = 0
     current_loss_val = 0
 
-    all_losses_train = []
+    all_losses = []
     all_losses_val = []
 
     start = time.time()
@@ -81,11 +83,6 @@ def train_model(title, file_name):
         category, line, category_tensor, line_tensor = random_training_pair(train_set)
         output, loss = rnn.train(category_tensor, line_tensor)
         current_loss += loss
-
-        _, _, category_tensor, line_tensor = random_training_pair(val_set)
-        out = rnn.evaluate(line_tensor)
-        loss = rnn.criterion(out, category_tensor)
-        current_loss_val += loss
 
         # Print epoch number, loss, name and guess
         if epoch % print_every == 0:
@@ -98,25 +95,42 @@ def train_model(title, file_name):
         
         # Add current loss avg to list of losses
         if epoch % plot_every == 0:
-            all_losses_train.append(current_loss / plot_every)
-            all_losses_val.append(current_loss_val / plot_every)
+            all_losses.append(current_loss / plot_every)
             current_loss = 0
             current_loss_val=0
 
-    torch.save(rnn, file_name) # save model
+            # check loss over 1000 random samples from validation set. if it has increased from the last epochs, stop training
+            val_loss=0
+            for iter in range(0, 1000):
+                _, _, category_tensor, line_tensor = random_training_pair(val_set)
+                out = rnn.evaluate(line_tensor)
+                loss = rnn.criterion(out, category_tensor)
+                val_loss += loss
 
+            val_loss=(val_loss/1000).data.numpy()
+            all_losses_val.append(val_loss)
+            print(epoch, len(all_losses_val))
+
+            print('\t%s %d %s %.4f' % ('epoch', epoch, 'val loss', val_loss))
+            if len(all_losses_val) > 1 and val_loss > all_losses_val[-2]:
+                print('early stopping')
+                break
+
+    # torch.save(rnn, file_name) # save model
+    # np.save('LSTM_model_8_train_loss.npy', all_losses) # save losses
+    # np.save('LSTM_model_8_val_loss.npy', all_losses_val)  # save losses
+
+    print(len(all_losses))
+    print(len(all_losses_val))
     # plot all losses
     plt.figure()
-
-    plt.plot(np.arange(0, n_epochs, plot_every), all_losses_train, label="train loss")
-    plt.plot(np.arange(0, n_epochs, plot_every), all_losses_val, label="val loss")
-    np.save('train_error_LSTM_model_5.npy', all_losses_train)
+    plt.plot(np.arange(plot_every, (1+len(all_losses))*plot_every, plot_every), all_losses, label='train loss')
+    plt.plot(np.arange(plot_every, (1+len(all_losses_val)) * plot_every, plot_every), all_losses_val, 'rx', label='val loss')
+    plt.legend(loc=2)
     plt.title(title)
-    plt.xlabel('epoch')
+    plt.xlabel('tot number of samples processed')
     plt.ylabel('cost')
-    plt.legend(loc=1)
     plt.show()
-
 
 
 def train_model_deterministic(title, file_name):
@@ -169,6 +183,8 @@ def train_model_deterministic(title, file_name):
                 all_losses.append(current_loss / plot_every)
                 current_loss = 0
 
+        # torch.save(rnn, file_name) # save model after every epoch (in case training stops for some reason)
+
         # check loss over 1000 random samples from validation set. if it has increased from the last epochs, stop training
         val_loss=0
         for iter in range(0, 1000):
@@ -179,14 +195,16 @@ def train_model_deterministic(title, file_name):
 
         val_loss=(val_loss/1000).data.numpy()
         all_losses_val.append(val_loss)
+
+
         print('\t%s %d %s %.4f' % ('epoch', epoch, 'val loss', val_loss))
         if val_loss > all_losses_val[epoch-1]:
             print('early stopping')
             break
 
-    torch.save(rnn, file_name) # save model
-    np.save('LSTM_model_8_train_loss.npy', all_losses) # save losses
-    np.save('LSTM_model_8_val_loss.npy', all_losses_val)  # save losses
+    # torch.save(rnn, file_name) # save model
+    # np.save('LSTM_model_8_train_loss.npy', all_losses) # save losses
+    # np.save('LSTM_model_8_val_loss.npy', all_losses_val)  # save losses
 
     # plot all losses
     plt.figure()
@@ -200,8 +218,46 @@ def train_model_deterministic(title, file_name):
 
 
 
+def hp_optimization():
+
+    # random search over hyperparameters
+    best_f1, best_n_hidden, best_eta, best_n_layers = -1, -1, -1, -1
+
+    for iter in range(1,50+1):
+        n_hidden = floor(random.uniform(100, 500))
+        n_layers = floor(random.uniform(1, 6))
+        global learning_rate
+        learning_rate = random.uniform(0.001, 0.1)
+        global rnn
+        rnn = RNN_LSTM(n_letters, n_hidden, n_layers, n_categories)
+
+        rnn.optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
+        rnn.criterion = nn.NLLLoss(weight=class_weights)
+
+        print('%s %d %s %d %s %d %s %.4f' % ('iter', iter, 'n_layers', n_layers, 'n_hidden', n_hidden, 'eta', learning_rate))
+
+        # do training over 1000 training samples, evaluate the average f1 score on a test set
+        for num in range(0, 1000):
+            _, _, category_tensor, line_tensor = random_training_pair(train_set)
+            output, loss = rnn.train(category_tensor, line_tensor)
+
+
+        f1=avg_f1()
+        if f1 > best_f1:
+            best_f1, best_n_hidden, best_n_layers, best_eta = test_acc, n_hidden, n_layers, learning_rate
+            print('%s %d %s %.4f %s %d %d %.4f' % ('iter', iter, 'avg f1 score:', best_f1, 'best params:', best_n_layers, best_n_hidden, best_eta))
+
+
+        print('%s %.4f %s %d %d %.4f' % ('avg f1 score:', best_f1, 'best params:', best_n_layers, best_n_hidden, best_eta))
+
+
+
+
+
+
 if __name__ == '__main__':
 
+    hp_optimization()
     print(str(sys.argv))
 
     if(len(sys.argv) < 2):
@@ -218,8 +274,8 @@ if __name__ == '__main__':
         title = 'RNN model'
     elif(model_type=='LSTM'):
         global rnn
-        rnn = RNN_LSTM(n_letters, n_hidden, n_categories)
-        file_name='LSTM_model_8.pt'
+        rnn = RNN_LSTM(n_letters, n_hidden, n_layers, n_categories)
+        file_name='LSTM_model_test.pt'
         title = 'LSTM model'
     else:
         print('input: model type (either RNN or LSTM)')
