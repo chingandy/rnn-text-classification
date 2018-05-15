@@ -1,13 +1,17 @@
-name				model 	n_epochs	print_every		plot_every	learning rate	data set		num_samples		num_hidden	combined	class weights	num_layers	time taken	rand sampling	
-model.pt			RNN 	100 000		1000			1000		0.005			world-cities	countries>100	128			yes			yes				1						yes
-LSTM_model.pt     	LSTM 	100 000 	1000			1000		0.005			world-cities	countries>100	128			no 			yes				1						yes
-LSTM_model_2.pt  	LSTM 	100 000		1000			1000		0.005			world-cities	countries>100	128			yes			yes				1						yes
-LSTM_model_3.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>100	128			yes			yes				1						yes
-LSTM_model_4.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			yes			yes				1						yes
-LSTM_model_5.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			yes			no				1			24m			yes
-LSTM_model_6.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			no				2			22m			yes
-LSTM_model_7.pt  	LSTM 	10			1000			1000		0.005			geonames		countries>300	128			no			yes				2			121m		no	
-LSTM_model_8.pt 	LSTM 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2						no
+name				model 	n_epochs	print_every		plot_every	learning rate	data set		num_samples		num_hidden	combined	class weights	num_layers	rand sampling	
+model.pt			RNN 	100 000		1000			1000		0.005			world-cities	countries>100	128			yes			yes				1			yes
+LSTM_model.pt     	LSTM 	100 000 	1000			1000		0.005			world-cities	countries>100	128			no 			yes				1			yes
+LSTM_model_2.pt  	LSTM 	100 000		1000			1000		0.005			world-cities	countries>100	128			yes			yes				1			yes
+LSTM_model_3.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>100	128			yes			yes				1			yes
+LSTM_model_4.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			yes			yes				1			yes
+LSTM_model_5.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			yes			no				1			yes
+LSTM_model_6.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			no				2			yes
+LSTM_model_7.pt  	LSTM 	10			1000			1000		0.005			geonames		countries>300	128			no			yes				2			no	
+LSTM_model_8.pt 	LSTM 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
+
+LSTM_model_9.pt 	LSTM 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
+LSTM_model_10.pt 	LSTM 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
+LSTM_model_11.pt 	LSTM 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
 
 evaluation
 
@@ -20,7 +24,7 @@ LSTM_model_4.pt 					0.14			15				17
 LSTM_model_5.pt 	24m				0.2				20.1			17.2
 LSTM_model_6.pt 	22m				0.1				13.9			12.8
 LSTM_model_7.pt 	121m		 	0.23			29				27
-
+LSTM_model_8.pt 	387m			0.3 			38 				38
 
 things that changed for each model:
 
