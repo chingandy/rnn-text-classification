@@ -1,0 +1,33 @@
+name				model 	n_epochs	print_every		plot_every	learning rate	data set		num_samples		num_hidden	combined	class weights	num_layers	time taken	rand sampling	
+model.pt			RNN 	100 000		1000			1000		0.005			world-cities	countries>100	128			yes			yes				1						yes
+LSTM_model.pt     	LSTM 	100 000 	1000			1000		0.005			world-cities	countries>100	128			no 			yes				1						yes
+LSTM_model_2.pt  	LSTM 	100 000		1000			1000		0.005			world-cities	countries>100	128			yes			yes				1						yes
+LSTM_model_3.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>100	128			yes			yes				1						yes
+LSTM_model_4.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			yes			yes				1						yes
+LSTM_model_5.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			yes			no				1			24m			yes
+LSTM_model_6.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			no				2			22m			yes
+LSTM_model_7.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			yes				2			121m		no	
+
+
+evaluation
+
+name 				avg f1-score	train acc		test acc	(on 10 000 samples)
+model.pt
+LSTM_model.pt 		0.18			21.6
+LSTM_model_2.pt 	0.2				21.9
+LSTM_model_3.pt 	0.04			6.4				7.5
+LSTM_model_4.pt 	0.14			15				17
+LSTM_model_5.pt 	0.2				20.1			17.2
+LSTM_model_6.pt 	0.1				13.9			12.8
+LSTM_model_7.pt 	0.23			29				27
+
+
+things that changed for each model:
+
+LSTM_model.pt 		-	introduced LSTM layer
+LSTM_model_2.pt 	-	did combined input and hidden (as in the original rnn)
+LSTM_model_3.pt 	-	new data set with more data points
+LSTM_model_4.pt 	-	more filtered data
+LSTM_model_5.pt 	-	no class weights
+LSTM_model_6.pt 	-	two LSTM layers
+LSTM_model_7.pt 	-	no random sampling - run through whole training set every epoch
