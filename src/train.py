@@ -13,7 +13,7 @@ import fileinput
 import sys
 
 n_hidden = 128
-n_epochs = 100000
+n_epochs = 10
 print_every = 1000
 plot_every = 1000
 learning_rate = 0.005 # If you set this too high, it might explode. If too low, it might not learn
@@ -23,9 +23,9 @@ def category_from_output(output):
     category_i = top_i[0][0]
     return all_categories[category_i], category_i
 
-def random_training_pair(current_dict):
+def random_training_pair():
     category = random.choice(all_categories)
-    line = random.choice(current_dict[category])
+    line = random.choice(country_dict[category])
     category_tensor = Variable(torch.LongTensor([all_categories.index(category)]))
     line_tensor = Variable(line_to_tensor(line))
     return category, line, category_tensor, line_tensor
@@ -144,7 +144,7 @@ def train_model_deterministic(title, file_name):
             if num % print_every == 0:
                 guess, guess_i = category_from_output(output)
                 correct = '✓' if guess == category else '✗ (%s)' % code_dict[category]                
-                print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, epoch / n_epochs * 100, time_since(start), loss, line, code_dict[guess], correct))
+                print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, num / (tot_train*n_epochs) * 100, time_since(start), loss, line, code_dict[guess], correct))
         
                 # just printing the sum of the weights to check that theyre not exploding or vanishing
                 print(np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy())) 
@@ -154,16 +154,19 @@ def train_model_deterministic(title, file_name):
                 all_losses.append(current_loss / plot_every)
                 current_loss = 0
 
+    torch.save(rnn, file_name) # save model
+
     # plot all losses
     plt.figure()
 
-    plt.plot(np.arange(0, n_epochs, plot_every), all_losses)
+    num_plot=(tot_train/plot_every)*n_epochs
+    np.save('train_loss_LSTM_model_7.npy', all_losses)
+    plt.plot(np.arange(0, num_plot, plot_every), all_losses)
     plt.title(title)
     plt.xlabel('epoch')
     plt.ylabel('cost')
     plt.show()
 
-    torch.save(rnn, file_name) # save model
 
 
 
@@ -187,7 +190,7 @@ if __name__ == '__main__':
     elif(model_type=='LSTM'):
         global rnn
         rnn = RNN_LSTM(n_letters, n_hidden, n_categories)
-        file_name='LSTM_model_5.pt'
+        file_name='LSTM_model_7.pt'
         title = 'LSTM model'
     else:
         print('input: model type (either RNN or LSTM)')
@@ -195,9 +198,9 @@ if __name__ == '__main__':
 
 
     rnn.optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
-    rnn.criterion = nn.NLLLoss()
+    rnn.criterion = nn.NLLLoss(weight=class_weights)
 
-    train_model(title, file_name)
-    # train_model_deterministic(title, file_name)
+    # train_model(title, file_name)
+    train_model_deterministic(title, file_name)
 
 
