@@ -15,13 +15,12 @@ import sys
 
 
 n_hidden = 128
-n_epochs = 10
+n_epochs = 20
 print_every = 1000
-n_epochs = 100000
 plot_every = 1000
 learning_rate = 0.005 # If you set this too high, it might explode. If too low, it might not learn
 
-n_layers=1
+n_layers=2
 
 def category_from_output(output):
     top_n, top_i = output.data.topk(1) # Tensor out of Variable with .data
@@ -186,9 +185,9 @@ def train_model_deterministic(title, file_name):
                 all_losses.append(current_loss / plot_every)
                 current_loss = 0
 
-        # torch.save(rnn, file_name) # save model after every epoch (in case training stops for some reason)
+        torch.save(rnn, file_name) # save model after every epoch (in case training stops for some reason)
 
-        # check loss over 1000 random samples from validation set. if it has increased from the last epochs, stop training
+        # check loss over 1000 random samples form validation set. if it has increased from the last epochs, stop training
         val_loss=0
         for iter in range(0, 1000):
             _, _, category_tensor, line_tensor = random_training_pair(val_set)
@@ -205,9 +204,9 @@ def train_model_deterministic(title, file_name):
             print('early stopping')
             break
 
-    # torch.save(rnn, file_name) # save model
-    # np.save('LSTM_model_8_train_loss.npy', all_losses) # save losses
-    # np.save('LSTM_model_8_val_loss.npy', all_losses_val)  # save losses
+    torch.save(rnn, file_name) # save model
+    np.save('GRU_model_8_train_loss.npy', all_losses) # save losses
+    np.save('GRU_model_8_val_loss.npy', all_losses_val)  # save losses
 
     # plot all losses
     plt.figure()
@@ -280,9 +279,9 @@ if __name__ == '__main__':
         title = 'LSTM model'
     elif(model_type=="GRU"):
         #global rnn
-        rnn = GRU(n_letters, n_hidden, n_categories)
+        rnn = GRU(n_letters, n_hidden, n_layers, n_categories)
+        file_name='GRU_model_8.pt'
         title='GRU model'
-        file_name='grumodel.pt'
     else:
         print('input: model type (either RNN or LSTM or GRU)')
         quit()
