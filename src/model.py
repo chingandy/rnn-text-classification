@@ -11,7 +11,7 @@ class RNN(nn.Module):
         self.i2h = nn.Linear(input_size + hidden_size, hidden_size)
         self.i2o = nn.Linear(input_size + hidden_size, output_size)
 
-        self.tanh = nn.Tanh(dim=1)
+        self.tanh = nn.Tanh()
 
         self.softmax = nn.LogSoftmax(dim=1)
 
@@ -26,7 +26,7 @@ class RNN(nn.Module):
         return output, hidden
 
     def init_hidden(self):
-        return Variable(torch.zeros(1, self.hidden_size))
+        return Variable(torch.zeros(1, self.hidden_size).cuda())
 
     def train(self, category_tensor, line_tensor):
         hidden = self.init_hidden()

@@ -152,20 +152,24 @@ def train_model_deterministic(title, file_name):
     for epoch in range(1, n_epochs + 1):
 
         # shuffle training set
-        if epoch > 1:
-            tot_tr=np.concatenate((np.expand_dims(X_train, axis=1), np.expand_dims(y_train, axis=1)), axis=1)
-            np.random.shuffle(tot_tr)
-            global X_train
-            X_train=tot_tr[:, 0]
-            global y_train
-            y_train=tot_tr[:, 1]
+        # if epoch > 1:
+        #     tot_tr=np.concatenate((np.expand_dims(X_train, axis=1), np.expand_dims(y_train, axis=1)), axis=1)
+        #     tot_tre=np.concatenate((np.expand_dims(X_tr_tensor, axis=1), np.expand_dims(y_tr_tensor, axis=1)), axis=1)
+        #     np.random.shuffle(tot_tr)
+        #     global X_train
+        #     X_train=tot_tr[:, 0]
+        #     global y_train
+        #     y_train=tot_tr[:, 1]
 
         for num in range(1, tot_train + 1):
 
             category=y_train[num-1]
             line=X_train[num-1]
-            category_tensor=Variable(torch.LongTensor([all_categories.index(category)]))
-            line_tensor=Variable(line_to_tensor(line))
+            # category_tensor=Variable(torch.LongTensor([all_categories.index(category)]))
+            # line_tensor=Variable(line_to_tensor(line))
+
+            category_tensor=y_tr_tensor[num-1]
+            line_tensor=X_tr_tensor[num-1]
             output, loss = rnn.train(category_tensor, line_tensor)
             current_loss += loss
             totsamples+=1
@@ -205,8 +209,8 @@ def train_model_deterministic(title, file_name):
             break
 
     torch.save(rnn, file_name) # save model
-    np.save('GRU_model_8_train_loss.npy', all_losses) # save losses
-    np.save('GRU_model_8_val_loss.npy', all_losses_val)  # save losses
+    np.save('model_8_train_loss.npy', all_losses) # save losses
+    np.save('model_8_val_loss.npy', all_losses_val)  # save losses
 
     # plot all losses
     plt.figure()
@@ -270,7 +274,7 @@ if __name__ == '__main__':
     if(model_type=="RNN"):
         #global rnn
         rnn = RNN(n_letters, n_hidden, n_categories)
-        file_name='model.pt'
+        file_name='model_8.pt'
         title = 'RNN model'
     elif(model_type=='LSTM'):
         #global rnn
@@ -286,7 +290,7 @@ if __name__ == '__main__':
         print('input: model type (either RNN or LSTM or GRU)')
         quit()
 
-
+    rnn=rnn.cuda()
     rnn.optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
     rnn.criterion = nn.NLLLoss(weight=class_weights)
 

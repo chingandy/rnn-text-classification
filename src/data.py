@@ -8,6 +8,7 @@ import string
 import unicodedata
 
 import torch
+from torch.autograd import Variable
 
 from math import sqrt, ceil
 
@@ -219,6 +220,31 @@ def partition_x_y():
     return X_train, y_train, X_val, y_val, X_test, y_test
 
 
+def tensorize():
+
+    X_tr_tensor = []
+    y_tr_tensor = []
+    for i in range(len(X_train)):
+        category=y_train[i]
+        line=X_train[i]
+        category_tensor=Variable(torch.LongTensor([all_categories.index(category)]).cuda())
+        line_tensor=Variable(line_to_tensor(line).cuda())
+        X_tr_tensor.append(line_tensor.cuda())
+        y_tr_tensor.append(category_tensor)
+
+    # X_val_tensor = []
+    # y_val_tensor = []
+    # for i in range(len(X_val)):
+    #     category=y_val[i]
+    #     line=X_val[i]
+    #     category_tensor=Variable(torch.LongTensor([all_categories.index(category)]))
+    #     line_tensor=Variable(line_to_tensor(line))
+    #     X_val_tensor.append(line_tensor)
+    #     y_val_tensor.append(category_tensor)
+
+    return X_tr_tensor, y_tr_tensor #, X_val_tensor, y_val_tensor
+
+
 # country_dict, all_categories, n_categories = build_dict_world_cities()
 country_dict, all_categories, n_categories, code_dict  = build_dict_geonames()
 
@@ -271,3 +297,4 @@ X_train, y_train, X_val, y_val, X_test, y_test = partition_x_y() # for "train_mo
 
 
 
+X_tr_tensor, y_tr_tensor = tensorize() # for "train_model_deterministic"
