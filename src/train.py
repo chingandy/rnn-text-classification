@@ -93,8 +93,8 @@ def train_model(title, file_name):
             print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, epoch / n_epochs * 100, time_since(start), loss, line, code_dict[guess], correct))
 
             # just printing the sum of the weights to check that theyre not exploding or vanishing
-            print(np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy())) 
-        
+            print(np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy()))
+
         # Add current loss avg to list of losses
         if epoch % plot_every == 0:
             all_losses.append(current_loss / plot_every)
@@ -136,7 +136,7 @@ def train_model(title, file_name):
 
 
 def train_model_deterministic(title, file_name):
-    
+
     # instead of randomly sampling data points, go through entire data set every epoch
     print(rnn)
     # Keep track of losses for plotting
@@ -153,17 +153,19 @@ def train_model_deterministic(title, file_name):
 
         # shuffle training set
         if epoch > 1:
+            global X_train
+            global y_train
             tot_tr=np.concatenate((np.expand_dims(X_train, axis=1), np.expand_dims(y_train, axis=1)), axis=1)
             np.random.shuffle(tot_tr)
-            global X_train
+            #global X_train
             X_train=tot_tr[:, 0]
-            global y_train
+            #global y_train
             y_train=tot_tr[:, 1]
 
         for num in range(1, tot_train + 1):
 
-            category=y_train[num-1]
-            line=X_train[num-1]
+            category = y_train[num-1]
+            line = X_train[num-1]
             category_tensor=Variable(torch.LongTensor([all_categories.index(category)]))
             line_tensor=Variable(line_to_tensor(line))
             output, loss = rnn.train(category_tensor, line_tensor)
@@ -174,12 +176,12 @@ def train_model_deterministic(title, file_name):
             if num % print_every == 0:
                 guess, guess_i = category_from_output(output)
                 correct = '✓' if guess == category else '✗ (%s)' % code_dict[category]
-                percent_done= totsamples / (tot_train * n_epochs)               
+                percent_done= totsamples / (tot_train * n_epochs)
                 print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, percent_done * 100, time_since(start), loss, line, code_dict[guess], correct))
-        
+
                 # just printing the sum of the weights to check that theyre not exploding or vanishing
-                print('\tweights', np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy())) 
-        
+                print('\tweights', np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy()))
+
             # Add current loss avg to list of losses
             if num % plot_every == 0:
                 all_losses.append(current_loss / plot_every)
@@ -292,5 +294,3 @@ if __name__ == '__main__':
 
     # train_model(title, file_name)
     train_model_deterministic(title, file_name)
-
-

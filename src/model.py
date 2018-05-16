@@ -11,7 +11,7 @@ class RNN(nn.Module):
         self.i2h = nn.Linear(input_size + hidden_size, hidden_size)
         self.i2o = nn.Linear(input_size + hidden_size, output_size)
 
-        self.tanh = nn.Tanh(dim=1)
+        self.tanh = nn.Tanh()
 
         self.softmax = nn.LogSoftmax(dim=1)
 
@@ -121,7 +121,7 @@ class GRU(nn.Module):
 
         combined=torch.cat((input[0],hidden[0]),1);
         hidden, (hidden) = self.i2h(input, (hidden))
-        output = self.i2o(combined) 
+        output = self.i2o(combined)
         output = self.softmax(output)
         return output, hidden
 
@@ -132,7 +132,7 @@ class GRU(nn.Module):
         hidden = self.init_hidden()
         self.optimizer.zero_grad()
 
-        line_tensor.unsqueeze_(1) 
+        line_tensor.unsqueeze_(1)
 
         for i in range(line_tensor.size()[0]):
             output, hidden = self(line_tensor[i], hidden)
