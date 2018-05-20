@@ -112,8 +112,8 @@ class GRU(nn.Module):
 
         self.hidden_size = hidden_size
         self.n_layers = n_layers
-        # self.i2h = nn.GRU(input_size, hidden_size, n_layers)
-        self.i2h = nn.GRU(input_size, hidden_size, n_layers, dropout=.2)
+        self.i2h = nn.GRU(input_size, hidden_size, n_layers)
+        # self.i2h = nn.GRU(input_size, hidden_size, n_layers, dropout=.2)
         self.i2o = nn.Linear(input_size+hidden_size, output_size)
         self.i2h.weight=self.i2h.weight_ih_l0 # make it easier to print weights
         self.softmax = nn.LogSoftmax(dim=1)
