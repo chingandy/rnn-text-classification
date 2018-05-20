@@ -1,4 +1,3 @@
-
 % last updated in April 2002 by Antje Endemann
 % Based on CVPR 07 and LNCS, with modifications by DAF, AZ and elle, 2008 and AA, 2010, and CC, 2011; TT, 2014; AAS, 2016
 
@@ -13,6 +12,8 @@
 \usepackage{tabularx}
 
 
+%\graphicspath{{../pdf/}{..\DD2424-Project\plots}}
+
 \begin{document}
 % \renewcommand\thelinenumber{\color[rgb]{0.2,0.5,0.8}\normalfont\sffamily\scriptsize\arabic{linenumber}\color[rgb]{0,0,0}}
 % \renewcommand\makeLineNumber {\hss\thelinenumber\ \hspace{6mm} \rlap{\hskip\textwidth\ \hspace{6.5mm}\thelinenumber}}
@@ -20,7 +21,18 @@
 \pagestyle{headings}
 \mainmatter
 \def\ECCV16SubNumber{***}
-\title{DD2424 Project - character-level text classification with different RNN architectures}
+\title{DD2424 Project - Character-Level Text Classification with different RNN Architectures}
+\author{
+	Ching-an Wu\\
+    {\tt cawu@kth.se}
+    \and
+    Rithika Harish Kumar\\
+    {\tt rihk@kth.se}
+    \and
+	Mathilda Strandberg von Schantz\\
+    {\tt matvs@kth.se}
+}
+\institute{KTH Royal Institute of Technology}
 
 \maketitle
 
@@ -30,9 +42,12 @@
 % • Abstract: Where you give an overview of the task and the findings
 % of your work in a nutshell.
 
+A character-level RNN is used to classify text(words) to the respective categories using Pytorch. This is an extension of a tutorial\cite{maintutorial}. But the tutorial has implemented only Recurrent neural networks. Where as we have also implemented Long short term memory and Gated recurrent unit. Also we have used a different dataset.   
+
 \dots
 \keywords{We would like to encourage you to list your keywords within
 the abstract section}
+Character-Level, Text classification, RNN, LSTM, GRU, Pytorch 
 \end{abstract}
 
 
@@ -52,7 +67,7 @@ The texts we are looking at are names of cities, and the classes are the names o
 The inspiration for the project is \href{https://github.com/spro/practical-pytorch/blob/master/char-rnn-classification/char-rnn-classification.ipynb}{a tutorial}
  in which a recurrent network is used to classify names as belonging to certain nationalities, using the Python framework \textit{Pytorch}. To start with, the model of that tutorial is to be replicated, then additional architectures will be implemented and compared. Questions we ask ourselves include: to what degree would a deeper network help in this problem? What sort of architectures are good in this application? Would an LSTM-layer in the recurrent network give better results? 
 
-To measure the success of the text classification, we will look at the precision, recall and f1-score of each category in the data set. This because it gives a more nuancued evaluation than accuracy, seeing as how the data set used is heavily skewed. Furthermore, we will visualize the results with a confusion matrix.
+To measure the success of the text classification, we will look at the precision, recall and f1-score of each category in the data set. This because it gives a more nuanced evaluation than accuracy, seeing as how the data set used is heavily skewed. Furthermore, we will visualize the results with a confusion matrix.
 
 
 \section{Background}
@@ -63,6 +78,72 @@ To measure the success of the text classification, we will look at the precision
 % Also, it is good to mention other recognition/synthesis tasks that use
 % the same deep learning technique as yours. (1-2 pages)
 
+Recurrent Neural Networks (RNNs) have been mainly used in sequential input learning problems such as text classification, speech recognition, translation and image captioning. For this project, out main goal is to use three different neural network architectures to perform character-level text classification and compare their performance based on the same datasets. The three networks are a vanilla Recurrent Neural Network (RNN), Long Short Term Memory network (LSTM) and Gated Recurrent Unit network (GRU). In fact, the last two networks are the variants of a classical RNN. 
+
+\section{Theory}
+
+This section consists of the working\cite{colah} of RNN, LSTM and GRU
+ 
+\subsection{RNN - Recurrent Neural Networks}
+
+Traditional neural networks do not use reasoning based on the previous events to inform the later ones. To allow information to persist, RNNs were used. These are networks with loops.
+
+\begin{figure}[h!]
+\centering
+        \includegraphics[width=0.3\linewidth]{working_rnn}
+    \caption{RNN Model}
+\end{figure}
+
+The above figure has a chunk of neural network A, with $x_t$ as input and $h_t$ as output. The loop allows information to be passed from one step to another. The basic equation is as follows:
+
+\[state = W_x x_t + W_h h_{t-1} + b \]
+\[h_t = tanh(state) \]
+
+Although RNNs help in keeping the information, it is difficult to have long term dependencies. In practise, RNNs dont seem to learn it. So, LSTM came into play.
+
+\subsection{LSTM - Long short term memory}
+
+LSTM is a special kind of RNN which is capable of long-term dependencies. It is done by having a cell state. Cell states are regulated by three gates called forget($f_t$), input($i_t$) and output($o_t$). They help in optionally letting information. Gates are composed of sigmoid neural net layer and pointwise multiplication operation.
+
+\begin{figure}[h!]
+\centering
+        \includegraphics[width=0.5\linewidth]{working_lstm}
+    \caption{LSTM}
+\end{figure}
+
+First step is to decide what information to throw away from cell state.
+
+\[f_t = \sigma(W_f.[h_{t-1},x_t] + b_f) \]
+
+Second step is to create a update. So decide what information to be stored in cell state. Next, a tanh layer creates a vector of candidate values($~C_t$) to be added.
+
+\[i_t = \sigma(W_i.[h_{t-1},x_t] + b_i) \]
+\[~C_t = tanh(W_c.[h_{t-1},x_t] + b_c) \]
+\[C_t = f_t * C_{t-1} + i_t * ~C_t \]
+
+Finally, we decide what parts of the cell to output by sigmoid layer. Then run a tanh and multiply with the output of sigmoid layer.
+
+\[o_t = \sigma(W_o.[h_{t-1},x_t] + b_o) \]
+\[ h_t = o_t * tanh(C_t)\]
+
+This way LSTM has the ability to allow which information to pass through.
+ 
+\subsection{GRU -  Gated Recurrent Unit}
+
+The idea behind a GRU layer is quite similar to that of a LSTM layer except that GRU has only two gates. The input and forget gates are coupled by an update gate ($z_t$) and the reset gate ($r_t$) is applied directly to the previous hidden state.  
+
+\begin{figure}[h!]
+\centering
+        \includegraphics[width=0.5\linewidth]{working_gru}
+    \caption{GRU}
+\end{figure}
+
+\[z_t = \sigma(W_z.[h_{t-1},x_t]) \]
+\[r_t = \sigma(W_r.[h_{t-1},x_t]) \]
+\[~h_t = tanh(W.[r_t * h_{t-1},x_t]) \]
+\[h_t = (1-z_t) * h_{t-1} + z_t * ~h_t \]
+
+Intuitively, the reset gate determines how to combine the new input with the previous memory, and the update gate defines how much of the previous memory to keep around. If we set the reset to all 1’s and  update gate to all 0’s we again arrive at our plain RNN model.
 
 \section{Approach}
 % • Approach: Describe the final approach you are take for this problem.
@@ -246,4 +327,16 @@ As \cite{Alpher04} said.
 
 \bibliographystyle{splncs}
 \bibliography{egbib}
+\begin{thebibliography}{9}
+
+	\bibitem{maintutorial}
+	'The tutorial refered'
+	\url{https://github.com/spro/practical-pytorch/blob/master/char-rnn-classification/char-rnn-classification.ipynb}
+
+\bibitem{colah}
+'The blog about RNN, LSTM and GRU
+\url{https://colah.github.io/posts/2015-08-Understanding-LSTMs/}
+
+
+\end{thebibliography}
 \end{document}

@@ -13,6 +13,9 @@ import matplotlib.ticker as ticker
 import fileinput
 import sys
 
+import re
+
+np.random.seed(0)
 
 n_hidden = 128
 n_epochs = 1630520
@@ -81,7 +84,11 @@ def train_model(title, file_name):
     start = time.time()
     patience=0
     old_val_before_increasing=-1
-    best_val_loss=2.4
+    best_val_loss=1e4 # can define your own "best_val_loss" if you are continuing training a model
+
+    m=re.search('([a-zA-Z0-9_]+).pt', file_name)
+    begin_file_name=m.group(1)
+
     for epoch in range(1, n_epochs + 1):
 
         category, line, category_tensor, line_tensor = random_training_pair(train_set)
@@ -96,7 +103,6 @@ def train_model(title, file_name):
 
             # just printing the sum of the weights to check that theyre not exploding or vanishing
             print('\tweights', np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy())) 
-        
         # Add current loss avg to list of losses
         if epoch % plot_every == 0:
             all_losses.append(current_loss / plot_every)
@@ -129,29 +135,29 @@ def train_model(title, file_name):
         if epoch % save_every == 0 and val_loss <= best_val_loss:
             print('saving model')
             torch.save(rnn, file_name)
-            np.save('GRU_model_10_train_loss.npy', all_losses)
-            np.save('GRU_model_10_val_loss.npy', all_losses_val)
+            np.save(begin_file_name + '_train_loss.npy', all_losses) # save losses
+            np.save(begin_file_name + '_val_loss.npy', all_losses_val)  # save losses
 
-
+    print('saving model')
     torch.save(rnn, file_name) # save model
-    np.save('GRU_model_10_train_loss.npy', all_losses) # save losses
-    np.save('GRU_model_10_val_loss.npy', all_losses_val)  # save losses
+    np.save(begin_file_name + '_train_loss.npy', all_losses)
+    np.save(begin_file_name + '_val_loss.npy', all_losses_val)
 
     print(len(all_losses))
     print(len(all_losses_val))
     # plot all losses
-    #plt.figure()
-    #plt.plot(np.arange(plot_every, (1+len(all_losses))*plot_every, plot_every), all_losses, label='train loss')
-    #plt.plot(np.arange(plot_every, (1+len(all_losses_val)) * plot_every, plot_every), all_losses_val, 'rx', label='val loss')
-    #plt.legend(loc=2)
-    #plt.title(title)
-    #plt.xlabel('tot number of samples processed')
-    #plt.ylabel('cost')
-    #plt.show()
+    plt.figure()
+    plt.plot(np.arange(plot_every, (1+len(all_losses))*plot_every, plot_every), all_losses, label='train loss')
+    plt.plot(np.arange(plot_every, (1+len(all_losses_val)) * plot_every, plot_every), all_losses_val, 'rx', label='val loss')
+    plt.legend(loc=2)
+    plt.title(title)
+    plt.xlabel('tot number of samples processed')
+    plt.ylabel('cost')
+    plt.show()
 
 
 def train_model_deterministic(title, file_name):
-    
+
     # instead of randomly sampling data points, go through entire data set every epoch
     print(rnn)
     # Keep track of losses for plotting
@@ -167,6 +173,9 @@ def train_model_deterministic(title, file_name):
     global X_train
     global y_train
 
+    m=re.search('([a-zA-Z0-9_]+).pt', file_name)
+    begin_file_name=m.group(1)
+
     for epoch in range(1, n_epochs + 1):
 
         # shuffle training set
@@ -177,8 +186,8 @@ def train_model_deterministic(title, file_name):
 
         for num in range(1, tot_train + 1):
 
-            category=y_train[num-1]
-            line=X_train[num-1]
+            category = y_train[num-1]
+            line = X_train[num-1]
             category_tensor=Variable(torch.LongTensor([all_categories.index(category)]))
             line_tensor=Variable(line_to_tensor(line))
 
@@ -192,9 +201,9 @@ def train_model_deterministic(title, file_name):
             if num % print_every == 0:
                 guess, guess_i = category_from_output(output)
                 correct = '✓' if guess == category else '✗ (%s)' % code_dict[category]
-                percent_done= totsamples / (tot_train * n_epochs)               
+                percent_done= totsamples / (tot_train * n_epochs)
                 print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, percent_done * 100, time_since(start), loss, line, code_dict[guess], correct))
-        
+
                 # just printing the sum of the weights to check that theyre not exploding or vanishing
                 print('\tweights', np.sum(rnn.i2o.weight.data.cpu().numpy()), np.sum(rnn.i2h.weight.data.cpu().numpy())) 
         
@@ -203,7 +212,11 @@ def train_model_deterministic(title, file_name):
                 all_losses.append(current_loss / plot_every)
                 current_loss = 0
 
+        print('saving model')
         torch.save(rnn, file_name) # save model after every epoch (in case training stops for some reason)
+        np.save(begin_file_name + '_train_loss.npy', all_losses) # save losses
+        np.save(begin_file_name + '_val_loss.npy', all_losses_val) # save losses
+
 
         # check loss over 1000 random samples form validation set. if it has increased from the last epochs, stop training
         val_loss=0
@@ -222,9 +235,10 @@ def train_model_deterministic(title, file_name):
             print('early stopping')
             break
 
+    print('saving model')
     torch.save(rnn, file_name) # save model
-    np.save('model_9_train_loss.npy', all_losses) # save losses
-    np.save('model_9_val_loss.npy', all_losses_val)  # save losses
+    np.save(begin_file_name + '_train_loss.npy', all_losses) # save losses
+    np.save(begin_file_name + '_val_loss.npy', all_losses_val) # save losses
 
     # plot all losses
     plt.figure()
@@ -298,17 +312,15 @@ if __name__ == '__main__':
     elif(model_type=="GRU"):
         #global rnn
         rnn = GRU(n_letters, n_hidden, n_layers, n_categories)
-        file_name='GRU_model_10.pt'
+        file_name='GRU_model_sjuttifjarton.pt'
         title='GRU model'
     else:
         print('input: model type (either RNN or LSTM or GRU)')
         quit()
 
-    rnn=torch.load(file_name)
+    # rnn=torch.load(file_name) # uncomment if you are continuing training an existing model
     rnn.optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
     rnn.criterion = nn.NLLLoss(weight=class_weights)
 
     train_model(title, file_name)
     #train_model_deterministic(title, file_name)
-
-
