@@ -8,15 +8,18 @@ LSTM_model_5.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	12
 LSTM_model_6.pt  	LSTM 	100 000		1000			1000		0.005			geonames		countries>300	128			no			no				2			yes
 LSTM_model_7.pt  	LSTM 	10			1000			1000		0.005			geonames		countries>300	128			no			yes				2			no	
 LSTM_model_8.pt 	LSTM 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
+GRU_model_8.pt 	 	GRU 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
+GRU_model_9.pt 	 	GRU 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
+GRU_model_10.pt	 	GRU 	 		 	5000			1000		0.005			geonames		countries>300	128			no 			yes				2			yes
+GRU_model_10_2.pt	GRU 	1085000	 	5000			1000		0.005			geonames		countries>300	128			no 			yes				2			yes
 
-LSTM_model_9.pt 	LSTM 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
-LSTM_model_10.pt 	LSTM 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
-LSTM_model_11.pt 	LSTM 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
+model_8.pt 			RNN 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
+
 
 evaluation
 
 name 				time taken		avg f1-score	train acc		test acc	(on 10 000 samples)		
-model.pt
+model.pt 							0.3				28.4			31.4
 LSTM_model.pt 						0.18			21.6
 LSTM_model_2.pt 					0.2				21.9
 LSTM_model_3.pt 					0.04			6.4				7.5
@@ -25,6 +28,11 @@ LSTM_model_5.pt 	24m				0.2				20.1			17.2
 LSTM_model_6.pt 	22m				0.1				13.9			12.8
 LSTM_model_7.pt 	121m		 	0.23			29				27
 LSTM_model_8.pt 	387m			0.3 			38 				38
+model_8.pt 			61m				0.09			12.8			12.8
+GRU_model_8.pt 		~300m 			0.32			41				42
+GRU_model_9.pt 		 				0.3								38
+GRU_model_10.pt 		 			0.25			26.7			29.2
+GRU_model_10_2.pt 		 			0.39			51				48.5
 
 things that changed for each model:
 
@@ -36,3 +44,14 @@ LSTM_model_5.pt 	-	no class weights
 LSTM_model_6.pt 	-	two LSTM layers
 LSTM_model_7.pt 	-	no random sampling - run through whole training set every epoch
 LSTM_model_8.pt 	-	check error on validation set to protect against overfitting  (also introduced shuffling the data between every epoch)
+model_8.pt 			-	did the same as LSTM_model_8.pt, but with "normal" RNN. when sseeing that the results were poor, redid it but with two layers
+GRU_model_8.pt 		-	did the same as LSTM_model_8.pt, buth with GRU layers
+GRU_model_9.pt 		-	introduce dropout
+GRU_model_10.pt 	-	no random sampling + early stopping only save when val error is at its lowest
+GRU_model_10_2.pt 	-	continued training GRU_model_10.pt, this time with softer criteria for early stopping. also only save when val error is at its lowest
+
+TODO: play around with learning rate, number of layers and number of hidden nodes, use momentum, use dropout, use batch normalization, use learning rate decay
+use batches instead of one sample at a time, to make it go faster
+- different optimizer
+- different loss/activation function
+
