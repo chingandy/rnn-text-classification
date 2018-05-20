@@ -12,6 +12,9 @@ GRU_model_8.pt 	 	GRU 	20		 	1000			1000		0.005			geonames		countries>300	128			
 GRU_model_9.pt 	 	GRU 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
 GRU_model_10.pt	 	GRU 	 		 	5000			1000		0.005			geonames		countries>300	128			no 			yes				2			yes
 GRU_model_10_2.pt	GRU 	1085000	 	5000			1000		0.005			geonames		countries>300	128			no 			yes				2			yes
+GRU_model_11.pt 	GRU 				5000			1000		0.005			geonames		countries>300	128			no 			yes 			2			yes
+GRU_model_12.pt 	GRU 				5000			1000		0.005			geonames		countries>300	128			no 			yes 			2			yes
+GRU_model_13.pt 	GRU 				5000			1000		0.001			geonames		countries>300	128			no 			yes 			2			yes
 
 model_8.pt 			RNN 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
 
@@ -33,6 +36,8 @@ GRU_model_8.pt 		~300m 			0.32			41				42
 GRU_model_9.pt 		 				0.3								38
 GRU_model_10.pt 		 			0.25			26.7			29.2
 GRU_model_10_2.pt 		 			0.39			51				48.5
+GRU_model_11.pt 			
+
 
 things that changed for each model:
 
@@ -49,6 +54,14 @@ GRU_model_8.pt 		-	did the same as LSTM_model_8.pt, buth with GRU layers
 GRU_model_9.pt 		-	introduce dropout
 GRU_model_10.pt 	-	no random sampling + early stopping only save when val error is at its lowest
 GRU_model_10_2.pt 	-	continued training GRU_model_10.pt, this time with softer criteria for early stopping. also only save when val error is at its lowest
+
+GRU_model_11.pt 	-	+ use momentum
+GRU_model_12.pt 	- 	other learning rate (0.001)
+GRU_model_12.pt 	- 	+ weight decay=0.001
+GRU_model_13.pt 	-	use batches 
+
+
+could continue training GRU_model_10, but continue training it deterministically
 
 TODO: play around with learning rate, number of layers and number of hidden nodes, use momentum, use dropout, use batch normalization, use learning rate decay
 use batches instead of one sample at a time, to make it go faster
