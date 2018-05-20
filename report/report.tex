@@ -1,4 +1,3 @@
-
 % last updated in April 2002 by Antje Endemann
 % Based on CVPR 07 and LNCS, with modifications by DAF, AZ and elle, 2008 and AA, 2010, and CC, 2011; TT, 2014; AAS, 2016
 
@@ -9,7 +8,7 @@
 \usepackage{color}
 \usepackage[width=122mm,left=12mm,paperwidth=146mm,height=193mm,top=12mm,paperheight=217mm]{geometry}
 
-\graphicspath{{../pdf/}{..\DD2424-Project\plots}}
+%\graphicspath{{../pdf/}{..\DD2424-Project\plots}}
 
 \begin{document}
 % \renewcommand\thelinenumber{\color[rgb]{0.2,0.5,0.8}\normalfont\sffamily\scriptsize\arabic{linenumber}\color[rgb]{0,0,0}}
@@ -19,10 +18,17 @@
 \mainmatter
 \def\ECCV16SubNumber{***}
 \title{DD2424 Project - Character-Level Text Classification with different RNN Architectures}
-\\Authors\\
-Ching-an Wu 
-Rithika Harish Kumar 
-Mathilda Strandberg von Schantz
+\author{
+	Ching-an Wu\\
+    {\tt cawu@kth.se}
+    \and
+    Rithika Harish Kumar\\
+    {\tt rihk@kth.se}
+    \and
+	Mathilda Strandberg von Schantz\\
+    {\tt matvs@kth.se}
+}
+\institute{KTH Royal Institute of Technology}
 
 \maketitle
 
@@ -56,7 +62,7 @@ Short-text classification is hard in that there is less information to go off wi
 
 The inspiration for the project is a tutorial in which a recurrent network is used to classify names as belonging to certain nationalities. To start with, the model of that tutorial is to be replicated, then additional architectures will be implemented and compared. Questions we ask ourselves include: to what degree would a deeper network help in this problem? What sort of architectures are good in this application? Would an LSTM-layer in the recurrent network give better results? 
 
-To measure the success of the text classification, we will look at the precision, recall and f1-score of each category in the data set. This because it gives a more nuancued evaluation than accuracy, seeing as how the data set used is heavily skewed. Furthermore, we will visualize the results with a confusion matrix.
+To measure the success of the text classification, we will look at the precision, recall and f1-score of each category in the data set. This because it gives a more nuanced evaluation than accuracy, seeing as how the data set used is heavily skewed. Furthermore, we will visualize the results with a confusion matrix.
 
 
 \section{Background}
@@ -66,6 +72,8 @@ To measure the success of the text classification, we will look at the precision
 % niques that can be (have been) used for the same task with success.
 % Also, it is good to mention other recognition/synthesis tasks that use
 % the same deep learning technique as yours. (1-2 pages)
+
+Recurrent Neural Networks (RNNs) have been mainly used in sequential input learning problems such as text classification, speech recognition, translation and image captioning. For this project, out main goal is to use three different neural network architectures to perform character-level text classification and compare their performance based on the same datasets. The three networks are a vanilla Recurrent Neural Network (RNN), Long Short Term Memory network (LSTM) and Gated Recurrent Unit network (GRU). In fact, the last two networks are the variants of a classical RNN. 
 
 \section{Theory}
 
@@ -77,7 +85,7 @@ Traditional neural networks do not use reasoning based on the previous events to
 
 \begin{figure}[h!]
 \centering
-        \includegraphics[width=0.5\linewidth]{plots/working_rnn.png}
+        \includegraphics[width=0.3\linewidth]{working_rnn}
     \caption{RNN Model}
 \end{figure}
 
@@ -94,8 +102,8 @@ LSTM is a special kind of RNN which is capable of long-term dependencies. It is 
 
 \begin{figure}[h!]
 \centering
-        \includegraphics[width=0.5\linewidth]{plots/working_lstm.png}
-    \caption{RNN}
+        \includegraphics[width=0.5\linewidth]{working_lstm}
+    \caption{LSTM}
 \end{figure}
 
 First step is to decide what information to throw away from cell state.
@@ -121,8 +129,8 @@ The idea behind a GRU layer is quite similar to that of a LSTM layer except that
 
 \begin{figure}[h!]
 \centering
-        \includegraphics[width=0.5\linewidth]{plots/working_gru.png}
-    \caption{RNN}
+        \includegraphics[width=0.5\linewidth]{working_gru}
+    \caption{GRU}
 \end{figure}
 
 \[z_t = \sigma(W_z.[h_{t-1},x_t]) \]
@@ -169,13 +177,16 @@ As \cite{Alpher04} said.
 
 \bibliographystyle{splncs}
 \bibliography{egbib}
-\begin{thebibliography}
+\begin{thebibliography}{9}
 
-\bibitem{maintutorial}
-\\\texttt{https://github.com/spro/practical-pytorch/blob/master/char-rnn-classification/char-rnn-classification.ipynb}
+	\bibitem{maintutorial}
+	'The tutorial refered'
+	\url{https://github.com/spro/practical-pytorch/blob/master/char-rnn-classification/char-rnn-classification.ipynb}
 
 \bibitem{colah}
-\\\texttt{https://colah.github.io/posts/2015-08-Understanding-LSTMs/}
+'The blog about RNN, LSTM and GRU
+\url{https://colah.github.io/posts/2015-08-Understanding-LSTMs/}
+
 
 \end{thebibliography}
 \end{document}
