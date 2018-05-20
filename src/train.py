@@ -14,6 +14,8 @@ import fileinput
 import sys
 
 
+np.random.seed(0)
+
 n_hidden = 128
 n_epochs = 1630520
 print_every = 5000
