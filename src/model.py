@@ -123,6 +123,7 @@ class GRU(nn.Module):
         hidden, (hidden) = self.i2h(input, (hidden))
         combined=torch.cat((input[0],hidden[0]),1);
         output = self.i2o(combined) 
+
         output = self.softmax(output)
         return output, hidden
 
@@ -133,7 +134,7 @@ class GRU(nn.Module):
         hidden = self.init_hidden()
         self.optimizer.zero_grad()
 
-        line_tensor.unsqueeze_(1) 
+        line_tensor.unsqueeze_(1)
 
         for i in range(line_tensor.size()[0]):
             output, hidden = self(line_tensor[i], hidden)
@@ -152,4 +153,3 @@ class GRU(nn.Module):
             output, hidden = self(line_tensor[i], hidden)
 
         return output
-
