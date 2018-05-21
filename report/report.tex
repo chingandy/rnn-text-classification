@@ -11,7 +11,6 @@
 \usepackage{hyperref}
 \usepackage{tabularx}
 
-
 %\graphicspath{{../pdf/}{..\DD2424-Project\plots}}
 
 \begin{document}
@@ -21,16 +20,11 @@
 \pagestyle{headings}
 \mainmatter
 \def\ECCV16SubNumber{***}
-\title{DD2424 Project - Character-Level Text Classification with different RNN Architectures}
+\title{Character-Level Text Classification with different RNN Architectures}
 \author{
-	Ching-an Wu\\
-    {\tt cawu@kth.se}
-    \and
-    Rithika Harish Kumar\\
-    {\tt rihk@kth.se}
-    \and
-	Mathilda Strandberg von Schantz\\
-    {\tt matvs@kth.se}
+	Ching-an Wu {\tt cawu@kth.se} \\
+    Rithika Harish Kumar {\tt rihk@kth.se} \\
+	Mathilda Strandberg von Schantz {\tt matvs@kth.se} \\
 }
 \institute{KTH Royal Institute of Technology}
 
@@ -42,12 +36,11 @@
 % • Abstract: Where you give an overview of the task and the findings
 % of your work in a nutshell.
 
-A character-level RNN is used to classify text(words) to the respective categories using Pytorch. This is an extension of a tutorial\cite{maintutorial}. But the tutorial has implemented only Recurrent neural networks. Where as we have also implemented Long short term memory and Gated recurrent unit. Also we have used a different dataset.   
+A character-level RNN is used to classify text(words) to the respective categories using Pytorch. This is an extension of a tutorial \cite{tutorial}. The extensions done to the tutorial include Long short term memory and Gated recurrent unit layers, as well as using a different dataset.   
 
 \dots
-\keywords{We would like to encourage you to list your keywords within
-the abstract section}
-Character-Level, Text classification, RNN, LSTM, GRU, Pytorch 
+\keywords{Character-Level, Text classification, RNN, LSTM, GRU, Pytorch}
+
 \end{abstract}
 
 
@@ -58,16 +51,15 @@ Character-Level, Text classification, RNN, LSTM, GRU, Pytorch
 % problem and also formally define the problem. (1-2 pages including
 % title, authors and abstract)
 
-We are looking at a text classification problem with short text and character-level classification. We will be using character-level classification. This means that the network processes the input one character at a time. Each character results in an output consisting of the probabilities for each letter for the next character. If we have a 58-character alphabet, the hidden state will consist of the probability of each of those 58 characters for the next letter in the sequence. So for each character, one such prediction is produced, as well as a hidden state, which is fed into the next step.
+We are looking at a text classification problem with short text and character-level classification. The data set used was initially the world-cities data set \cite{world-cities}, but was later extended to the bigger geonames data set \cite{geonames}. More specifically, its the collection of (city, country) pairs from the most highly populated cities of the world. There are circa 240 categories (countries) in both data sets, but we will limit the number of categories so as not to make the categories too unevenly distributed (ie remove countries with too few cities in the data set).
+
+We will be using character-level classification. This means that the network processes the input one character at a time. Each character results in an output consisting of the probabilities for each letter for the next character. If we have a 58-character alphabet, the hidden state will consist of the probability of each of those 58 characters for the next letter in the sequence. So for each character, one such prediction is produced, as well as a hidden state, which is fed into the next step.
 
 Short-text classification is hard in that there is less information to go off with little to no grammar or syntax. Some applications of short-text classification include search queries and information retrieval, mapping a product name to its associated product, the classification of titles, questions, sentences, and short messages.
 
-The texts we are looking at are names of cities, and the classes are the names of the country the city belongs to. To begin with, we used the world-cities data set. We later abandoned it for geonames, because it has more samples. There are circa 240 categories (countries) in the data sets, but we will limit the number of categories so as not to make the categories too unevenly distributed (ie remove countries with too few cities in the data set).
+The inspiration for the project is a tutorial in which a recurrent network is used to classify names as belonging to certain nationalities \cite{tutorial}. To start with, the model of that tutorial is to be replicated, then additional architectures will be implemented and compared. Questions we ask ourselves include: would the model on the tutorial work on a different data set? To what degree would a deeper network help in this problem? Would an LSTM-layer in the recurrent network give better results? 
 
-The inspiration for the project is \href{https://github.com/spro/practical-pytorch/blob/master/char-rnn-classification/char-rnn-classification.ipynb}{a tutorial}
- in which a recurrent network is used to classify names as belonging to certain nationalities, using the Python framework \textit{Pytorch}. To start with, the model of that tutorial is to be replicated, then additional architectures will be implemented and compared. Questions we ask ourselves include: to what degree would a deeper network help in this problem? What sort of architectures are good in this application? Would an LSTM-layer in the recurrent network give better results? 
-
-To measure the success of the text classification, we will look at the precision, recall and f1-score of each category in the data set. This because it gives a more nuanced evaluation than accuracy, seeing as how the data set used is heavily skewed. Furthermore, we will visualize the results with a confusion matrix.
+To measure the success of the text classification, we will look at the average f1-score and accuracy across all categories in the data set. Furthermore, we will visualize the results with a confusion matrix.
 
 
 \section{Background}
@@ -78,11 +70,17 @@ To measure the success of the text classification, we will look at the precision
 % Also, it is good to mention other recognition/synthesis tasks that use
 % the same deep learning technique as yours. (1-2 pages)
 
-Recurrent Neural Networks (RNNs) have been mainly used in sequential input learning problems such as text classification, speech recognition, translation and image captioning. For this project, out main goal is to use three different neural network architectures to perform character-level text classification and compare their performance based on the same datasets. The three networks are a vanilla Recurrent Neural Network (RNN), Long Short Term Memory network (LSTM) and Gated Recurrent Unit network (GRU). In fact, the last two networks are the variants of a classical RNN. 
+Recurrent Neural Networks (RNNs) have been mainly used in sequential input learning problems such as text classification, speech recognition, translation and image captioning. For this project, our main goal is to use three different neural network architectures to perform character-level text classification and compare their performance based on the same datasets. The three networks are a vanilla Recurrent Neural Network (RNN), Long Short Term Memory network (LSTM) and Gated Recurrent Unit network (GRU). In fact, the last two networks are the variants of a classical RNN. 
+
+In the related works, we can find that character-level neural network models have several advantages in comparison to word-level models or even n-gram neural networks. In \cite{low2016character}, Low M. stated that character-based model can reduce the use of memory significantly because there is no need to create word embedding matrix\cite{kim2016character}. As for text prediction, he also indicated character-level models were found to be outperformed by word-level models in general. In \cite{zhang2015character}, Zhang et al. also believed that in most cases character-based models had better performance because characters constitute a necessary construct no matter how text was separated, and they can still learn even abnormal character combinations such as misspellings and emoticons existed in text.    
+
+Considering other variants of recurrent neural networks, \cite{de2018character} had a good explanation for them. This paper states that generating and modeling dynamic sequences of discrete tokens is the core application of character-based recurrent neural networks. In other words, RNNs are designed to maintain a summary of the past sequence in their memory or by so-called "hidden state". More over, they also mentioned that some extensions of vanilla RNN such as LSTM and GRU are designed to help maintain long-term dependencies and to address the vanishing gradient problem. Perhaps that is why in our task LSTM and GRU are not outperformed by classic RNN significantly. 
+
+Apart from using RNN-only models in text classification, \cite{liu2017character} proposed a network which is a combination of convolutional neural networks (CNN) and recurrent neural network (RNN). The reason that Liu introduced a CNN into their model is because short text is characterized of short length, sparse features and strong context dependency. And as we know, CNN has a good performance when it comes to feature extraction. This paper also mentioned that most of techniques based on words always suffer from abnormal character combinations.   
 
 \section{Theory}
 
-This section consists of the working\cite{colah} of RNN, LSTM and GRU
+This section consists of the workings of RNN, LSTM and GRU. The basis of the information in this section is taken from \cite{colah}.
  
 \subsection{RNN - Recurrent Neural Networks}
 
@@ -90,7 +88,7 @@ Traditional neural networks do not use reasoning based on the previous events to
 
 \begin{figure}[h!]
 \centering
-        \includegraphics[width=0.3\linewidth]{working_rnn}
+        \includegraphics[width=0.2\linewidth]{plots/working_rnn}
     \caption{RNN Model}
 \end{figure}
 
@@ -103,15 +101,16 @@ Although RNNs help in keeping the information, it is difficult to have long term
 
 \subsection{LSTM - Long short term memory}
 
-LSTM is a special kind of RNN which is capable of long-term dependencies. It is done by having a cell state. Cell states are regulated by three gates called forget($f_t$), input($i_t$) and output($o_t$). They help in optionally letting information. Gates are composed of sigmoid neural net layer and pointwise multiplication operation.
+LSTM is a special kind of RNN which is capable of long-term dependencies. It is done by having a cell state. The cell state is kind of like a belt which allows information to just flow along it unchanged.
+Cell states are regulated by three gates called forget($f_t$), input($i_t$) and output($o_t$). They help in optionally letting information through. Gates are composed of sigmoid neural net layer and pointwise multiplication operation.
 
 \begin{figure}[h!]
 \centering
-        \includegraphics[width=0.5\linewidth]{working_lstm}
-    \caption{LSTM}
+        \includegraphics[width=0.4\linewidth]{plots/working_lstm}
+    \caption{LSTM unit}
 \end{figure}
 
-First step is to decide what information to throw away from cell state.
+First step is to decide what information to throw away from cell state. This is done by the sigmoid layer by outputting numbers between zero to one. Where zero means nothing is let through and one means everything is let through.
 
 \[f_t = \sigma(W_f.[h_{t-1},x_t] + b_f) \]
 
@@ -134,8 +133,8 @@ The idea behind a GRU layer is quite similar to that of a LSTM layer except that
 
 \begin{figure}[h!]
 \centering
-        \includegraphics[width=0.5\linewidth]{working_gru}
-    \caption{GRU}
+        \includegraphics[width=0.5\linewidth]{plots/working_gru}
+    \caption{GRU unit}
 \end{figure}
 
 \[z_t = \sigma(W_z.[h_{t-1},x_t]) \]
@@ -160,7 +159,7 @@ The first experiment was simply taking the model from the tutorial and running i
 
 \begin{figure}[h!]
 	\centering
-    \includegraphics[width=.5\textwidth]{../plots/tutorial_model.png}
+    \includegraphics[width=.5\textwidth]{plots/tutorial_model.png}
 	\caption{ Model from the text classification tutorial.}
 	\label{fig:model_tutorial}
 \end{figure}
@@ -174,7 +173,7 @@ The data preprocessing was simple: the data was converted to ASCII-characters an
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=.5\textwidth]{../plots/dist.png}	
+	\includegraphics[width=.5\textwidth]{plots/dist.png}	
 	\caption{ World-cities distribution.}
 	\label{fig:world_cities}
 \end{figure}
@@ -184,13 +183,13 @@ and the final average f1 score (averaged over all the categories) was 0.3. The t
 
 \begin{figure}[h!]
 	\centering
-        \includegraphics[width=.5\textwidth]{../plots/confusion_matrix_initial.png}
+        \includegraphics[width=.5\textwidth]{plots/confusion_matrix_initial.png}
 	\caption{ Confusion matrix of first RNN model.}
 	\label{fig:conf_init}
 \end{figure}
 
 
-While it is true that the model has a pretty good accuracy for some of the categories, it is still performing pretty unevenly for the categories. As seen in the figure, it is moderately good at classifying countries like Thailand and Korea, but not very good at classfiying countries like Colombia or Indonesia (indeed it seems to never predict them). We do not see a clear pattern from the class distribution (for example the US is overrepresented in the data set but is not predicted more often than other countries). This is because of how the random sampling is made - first a random category is chosen, then a sample will be taken randomly from that category. Therefore, the number of times we're exposed to samples from different categories will be more or less even.
+While it is true that the model has a pretty good accuracy for some of the categories, it is still performing pretty unevenly for the categories. As seen in the figure, it is moderately good at classifying countries like Thailand and Korea, but not very good at classifying countries like Colombia or Indonesia (indeed it seems to never predict them). We do not see a clear pattern from the class distribution (for example the US is overrepresented in the data set but is not predicted more often than other countries). This is because of how the random sampling is made - first a random category is chosen, then a sample will be taken randomly from that category. Therefore, the number of times we're exposed to samples from different categories will be more or less even.
 
 \subsection{Introducing LSTM and GRU}
 
@@ -198,37 +197,16 @@ We wanted to see if an LSTM-layer could improve the performance of the network. 
 
 LSTMs are also supposed to be good against exploding and vanishing gradients, which is a common problem in backpropagation-through-time, the most common learning algorithm for standard recurrent networks.
 
-
-When we have an LSTM cell in Pytorch, it takes an input, a hidden state and a cell state and it does the following computations
-
-\begin{gather}
-	i_t = \sigma(W_{i,i} x_t + b_{i,i} + W_{h,i} h_{t-1} + b_{h,i}) \\
-	f_t = \sigma(W_{i,f}x_t + b_{i,f} + W_{h,f}h_{t-1} + b_{h,f}) \\
-	g_t = tanh(W_{i,g}x_t + b_{i,g} + W_{h,g}h_{t-1} + b_{h,g}) \\
-	o_t = \sigma(W_{i,o}x_t + b_{i,o} + W_{h,o}h_{t-1} + b_{h,o}) \\
-	c_t = f_tc_{t-1} + i_tg_t \\
-	h_t = o_t tanh(c_t)
-\end{gather}
-
-where $h_t$ is the hidden state at time t, $c_t$ is the cell state at time t, $x_t$ is the input, $h_{t-1}$ is the hidden state at the previous time step and $i_t$, $f_t$, $g_t$ and $o_t$ are the input, forget, cell and output gates. \cite{torchdoc}
-
-In other words, the LSTM cell works by applying nonlinear functions to both inputs and internal variables. 
-% TODO: write more about LSTMs
-
- 
 The first LSTM experiment was simply running the same model as before, but replacing the linear layer for an LSTM layer.
  
 \begin{figure}[h!]
 	\centering
-        \includegraphics[width=.5\textwidth]{../plots/conf_matrix_initial_LSTM.png}
+        \includegraphics[width=.5\textwidth]{plots/conf_matrix_initial_LSTM.png}
 	\caption{ Confusion matrix of first LSTM model.}
 	\label{fig:conf_initial_lstm}
 \end{figure}
  
-It ended up not performing as well as the standard RNN after having been trained in the same way (same hyper-parameters, same number of epochs). As seen in figure \ref{fig:conf_initial_lstm}, the max accuracy is 0.5 rather than 0.6, and there are more incorrect predictions.
- 
-Some more iterations of different LSTM architectures were tried.
-Things that were changed for each model are laid out in table \ref{tab:LSTMs}, and the results of the models are seen in table \ref{tab:LSTM_models}.
+It ended up not performing as well as the standard RNN after having been trained in the same way (same hyper-parameters, same number of epochs). As seen in figure \ref{fig:conf_initial_lstm}, the max accuracy is 0.5 rather than 0.6, and there are more incorrect predictions. Some more iterations of different LSTM architectures were tried. Things that were changed for each model are laid out in table \ref{tab:LSTMs}, and the results of the models are seen in table \ref{tab:LSTM_models}.
 
 \begin{table}[h!]
     \begin{center}
@@ -273,18 +251,16 @@ All LSTM models performed worse than the original RNN, up until model 8. Introdu
 
 \begin{figure}[h!]
 	\centering
-	\includegraphics[width=.5\linewidth]{../plots/geonames_set.png}
+	\includegraphics[width=.5\linewidth]{plots/geonames_set.png}
 	\caption{ Geonames data set distribution.}
 	\label{fig:geonames}
 \end{figure}
 
 This seemed to indicate that the data set needed to be filtered more, so all countries with less than 300 cities were removed.
 
-After filtering the data more, the results were a bit better. However, the accuracy was still pretty low. This because the random sampling of data points meant all categories received the same attention, which was not good in terms of accuracy because some categories were indeed heavily overrepresented in the data set but not in the predictions of the model.
-Likewise, the model did not immediately perform better with two LSTM layers rather than one. It turns out that it simply needed to run for more epochs to account for the bigger data set and the bigger model. Indeed, model 8 performed best so far because it was run for more epochs.
+After filtering the data more, the results were a bit better. However, the accuracy was still pretty low. Likewise, the model did not immediately perform better with two LSTM layers rather than one. It turns out that it simply needed to run for more epochs to account for the bigger data set and the bigger model. Indeed, model 8 performed best so far because it was run for more epochs.
  
 After this, a GRU model was implemented and tested. It was run in the same way as LSTM model 8. And out of curiosity, a similar standard two-layer RNN was run in the same way. The result of this comparison is seen in table \ref{tab:GRU_LSTM_RNN_comp}.
-
 
 \begin{table}[h!]
     \begin{center}
@@ -301,7 +277,48 @@ After this, a GRU model was implemented and tested. It was run in the same way a
 
 The GRU performed similar to the LSTM, just slightly better. However, it trained markedly faster. Meanwhile, the simpler RNN did not perform well, as it started suffering from exploding gradients. In its predictions, it exclusively predicted countries that are overrepresented in the data set. 
 
-\section{Results}
+To look closer at the results of the GRU model, the confusion matrix is presented in figure \ref{fig:gru8}.  Note that this confusion matrix looks different from the previous, seeing as this is run on a different data set. The countries are here given by their two ISO 3166-1 codes. There are 55 categories in total, after having filtered the data. The confusion matrix is created by looking at 10 000 random samples taken from the test set.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=.5\linewidth]{plots/conf_matrix_GRU_model_8.png}
+	\caption{ Confusion matrix of the GRU model.}
+	\label{fig:gru8}
+\end{figure}
+
+In the confusion matrix, we see that the model has a good accuracy on some countries. However, with so many categories it's hard to have a perfect prediction for all of them. Some countries are rarely predicted, while others are more likely to be predicted (such as the US and France). There are also some countries that are often confused with each other, such as (DE, AT), (GT,MX), (US,AU),(ZA,US), (PK, IN), and (UA, RU), which stand for the countries (Germany, Austria), (Guatemala, Mexico), (United States, Autralia), (South Africa, United States), (Pakistan, India), and (Ukraine, Russia). All of these seems sensible that the model would confuse, since they have similar languages and/or are close to each other geographically.
+
+To see if the GRU model would perform better with more regularization, it was run in the same way as before but with a dropout of 20 percent. After that, it was explored whether that same model would perform better if trained with random sampling (ie ran for a number of epochs were, for each epoch, a training point is sampled randomly with replacement from the training set) yet again, but this time for more epochs. Perhaps running with random sampling is actually better for this application, since it would be less likely to overfit to overrepresented categories. Perhaps randomly sampling leads to better generalization in this instance.
+
+Some more changes were introduced to the training of the model. One being that early stopping was introduced. The early stopping worked as follows: if the validation error has been increasing for \textit{patience} number of epochs, the model would stop training. \textit{patience} was set to 10. Furthermore, the model was only saved if the validation error was at its lowest. In this way, the model would not be saved when it started overfitting. The number of epochs was set to $1630520 = 81526 \cdot 20$, which is equivalent to running through the entire training set 20 times (since one "epoch" is just processing one randomly sampled training point).
+
+The results of these experiments are given in table \ref{tab:additonal}.
+
+\begin{table}[h!]
+    \begin{center}
+        \caption{Introducing dropout and training with random sampling again.}
+        \label{tab:additonal}
+		\begin{tabularx}{.8\textwidth}{ | c | c | c |}
+			\textbf{model description} & \textbf{average f1} & \textbf{test accuracy} \\
+			GRU with 0.2 dropout & 0.3 & 38 \\
+			GRU with 0.2 dropout and random sampling & 0.39 & 48.5  \\
+		\end{tabularx}  
+    \end{center}
+\end{table}
+
+Only introducing dropout did not do much in terms of performance, while running with random sampling did perform better given more epochs to train. This because all countries receive a similar level of attention, which means the model might not have the highest maximum accuracy among all categories, but has a better average accuracy. This is also confirmed by the confusion matrix of the model given in figure \ref{fig:gru10}. This is the model that has performed most consistently good across all categories. While the number of epochs was set to 1 630 520 the model presented here was from when the validation error was at its lowest, which occurred on epoch 1 085 000.
+
+\begin{figure}[!ht]
+	\centering
+	\includegraphics[width=.5\linewidth]{plots/conf_matrix_GRU_model_10.png}
+	\caption{ Confusion matrix of the GRU model trained through random sampling from the data set.}
+	\label{fig:gru10}
+\end{figure}
+
+
+
+%\section{Results} I think we should skip "Results" since all results are presented in the "Experiments" section //Mathilda
+
 \section{Conclusions}
 
 % • Experiments/Results/Conclusions: In this section, you should
@@ -311,7 +328,6 @@ The GRU performed similar to the LSTM, just slightly better. However, it trained
 % and results reported here should justify some of the design choices
 % described in the previous sections. (3-6 pages)
 
-As \cite{Alpher04} said.
 
 % • References: It is extremely important to make sure all the content
 % from other sources and the ideas that you build on are properly cited.
@@ -324,19 +340,9 @@ As \cite{Alpher04} said.
 % The stated number of pages above is a guideline, one can go beyond that or
 % slightly below. The whole report should be between 7-14 pages.
 
+\clearpage
 
 \bibliographystyle{splncs}
 \bibliography{egbib}
-\begin{thebibliography}{9}
 
-	\bibitem{maintutorial}
-	'The tutorial refered'
-	\url{https://github.com/spro/practical-pytorch/blob/master/char-rnn-classification/char-rnn-classification.ipynb}
-
-\bibitem{colah}
-'The blog about RNN, LSTM and GRU
-\url{https://colah.github.io/posts/2015-08-Understanding-LSTMs/}
-
-
-\end{thebibliography}
 \end{document}
