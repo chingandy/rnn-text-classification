@@ -103,7 +103,7 @@ def train_model(title, file_name):
             print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, epoch / n_epochs * 100, time_since(start), loss, line, code_dict[guess], correct))
 
             # just printing the sum of the weights to check that theyre not exploding or vanishing
-            print('\tweights', np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy())) 
+            print('\tweights', np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy()))
         # Add current loss avg to list of losses
         if epoch % plot_every == 0:
             all_losses.append(current_loss / plot_every)
@@ -120,7 +120,7 @@ def train_model(title, file_name):
 
             val_loss=(val_loss/1000).data.numpy()
             all_losses_val.append(val_loss)
-            
+
             if val_loss < best_val_loss:
                 best_val_loss=val_loss
             print('\t%s %d %s %.4f' % ('epoch', epoch, 'val loss', val_loss))
@@ -209,8 +209,8 @@ def train_model_deterministic(title, file_name):
                 print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, percent_done * 100, time_since(start), loss, line, code_dict[guess], correct))
 
                 # just printing the sum of the weights to check that theyre not exploding or vanishing
-                print('\tweights', np.sum(rnn.i2o.weight.data.cpu().numpy()), np.sum(rnn.i2h.weight.data.cpu().numpy())) 
-        
+                print('\tweights', np.sum(rnn.i2o.weight.data.cpu().numpy()), np.sum(rnn.i2h.weight.data.cpu().numpy()))
+
             # Add current loss avg to list of losses
             if num % plot_every == 0:
                 all_losses.append(current_loss / plot_every)
@@ -229,7 +229,7 @@ def train_model_deterministic(title, file_name):
 
         if val_loss < best_val_loss:
             best_val_loss=val_loss
-    
+
         if len(all_losses_val) > 1 and val_loss > all_losses_val[-2]:
             patience+=1
             old_val_before_increasing=all_losses_val[-2]
@@ -314,8 +314,8 @@ if __name__ == '__main__':
     print(model_type)
     if(model_type=="RNN"):
         #global rnn
-        rnn = RNN(n_letters, n_hidden, n_categories)
-        file_name='model_8.pt'
+        rnn = RNN(n_letters, n_hidden,n_layers, n_categories)
+        file_name='model.pt'
         title = 'RNN model'
     elif(model_type=='LSTM'):
         #global rnn
