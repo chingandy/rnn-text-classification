@@ -23,7 +23,7 @@ print_every = 5000
 plot_every = 1000
 learning_rate = 0.005 # If you set this too high, it might explode. If too low, it might not learn
 save_every=10000
-n_layers=2
+n_layers=1
 
 def category_from_output(output):
     top_n, top_i = output.data.topk(1) # Tensor out of Variable with .data
@@ -312,7 +312,7 @@ if __name__ == '__main__':
     elif(model_type=="GRU"):
         #global rnn
         rnn = GRU(n_letters, n_hidden, n_layers, n_categories)
-        file_name='GRU_model_sjuttifjarton.pt'
+        file_name='GRU_model_14.pt'
         title='GRU model'
     else:
         print('input: model type (either RNN or LSTM or GRU)')
@@ -320,7 +320,7 @@ if __name__ == '__main__':
 
     # rnn=torch.load(file_name) # uncomment if you are continuing training an existing model
     rnn.optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
-    rnn.criterion = nn.NLLLoss(weight=class_weights)
+    rnn.criterion = nn.NLLLoss()
 
     train_model(title, file_name)
     #train_model_deterministic(title, file_name)
