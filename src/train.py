@@ -21,7 +21,7 @@ n_hidden = 128
 n_epochs = 1630520
 print_every = 5000
 plot_every = 1000
-learning_rate = 0.005 # If you set this too high, it might explode. If too low, it might not learn
+learning_rate = 0.01 # If you set this too high, it might explode. If too low, it might not learn
 save_every=10000
 n_layers=2
 
@@ -132,16 +132,18 @@ def train_model(title, file_name):
             if patience > 10:
                 print('early stopping')
                 break
-        if epoch % save_every == 0 and val_loss <= best_val_loss:
+        if epoch % save_every == 0 and val_loss <= best_val_loss:  # only save if validation error is at its lowest
             print('saving model')
             torch.save(rnn, file_name)
             np.save(begin_file_name + '_train_loss.npy', all_losses) # save losses
             np.save(begin_file_name + '_val_loss.npy', all_losses_val)  # save losses
 
-    print('saving model')
-    torch.save(rnn, file_name) # save model
-    np.save(begin_file_name + '_train_loss.npy', all_losses)
-    np.save(begin_file_name + '_val_loss.npy', all_losses_val)
+
+    if val_loss <= best_val_loss:  # only save if validation error is at its lowest
+        print('saving model')
+        torch.save(rnn, file_name) # save model
+        np.save(begin_file_name + '_train_loss.npy', all_losses)
+        np.save(begin_file_name + '_val_loss.npy', all_losses_val)
 
     print(len(all_losses))
     print(len(all_losses_val))
@@ -176,6 +178,9 @@ def train_model_deterministic(title, file_name):
     m=re.search('([a-zA-Z0-9_]+).pt', file_name)
     begin_file_name=m.group(1)
 
+    best_val_loss=1e4 # can define your own "best_val_loss" if you are continuing training a model
+
+
     for epoch in range(1, n_epochs + 1):
 
         # shuffle training set
@@ -191,8 +196,6 @@ def train_model_deterministic(title, file_name):
             category_tensor=Variable(torch.LongTensor([all_categories.index(category)]))
             line_tensor=Variable(line_to_tensor(line))
 
-            #category_tensor=y_tr_tensor[num-1]
-            #line_tensor=X_tr_tensor[num-1]
             output, loss = rnn.train(category_tensor, line_tensor)
             current_loss += loss
             totsamples+=1
@@ -212,12 +215,6 @@ def train_model_deterministic(title, file_name):
                 all_losses.append(current_loss / plot_every)
                 current_loss = 0
 
-        print('saving model')
-        torch.save(rnn, file_name) # save model after every epoch (in case training stops for some reason)
-        np.save(begin_file_name + '_train_loss.npy', all_losses) # save losses
-        np.save(begin_file_name + '_val_loss.npy', all_losses_val) # save losses
-
-
         # check loss over 1000 random samples form validation set. if it has increased from the last epochs, stop training
         val_loss=0
         for iter in range(0, 1000):
@@ -229,16 +226,31 @@ def train_model_deterministic(title, file_name):
         val_loss=(val_loss/1000).data.numpy()
         all_losses_val.append(val_loss)
 
-
-        print('\t%s %d %s %.4f' % ('epoch', epoch, 'val loss', val_loss))
-        if val_loss > all_losses_val[epoch-1]:
+        if val_loss < best_val_loss:
+            best_val_loss=val_loss
+    
+        if len(all_losses_val) > 1 and val_loss > all_losses_val[-2]:
+            patience+=1
+            old_val_before_increasing=all_losses_val[-2]
+        if val_loss < old_val_before_increasing:
+            patience=0
+            old_val_before_increasing=-1
+        if patience > 10:
             print('early stopping')
             break
+        if val_loss <= best_val_loss: # only save if validation error is at its lowest
+            print('saving model')
+            torch.save(rnn, file_name) # save model after every epoch (in case training stops for some reason)
+            np.save(begin_file_name + '_train_loss.npy', all_losses) # save losses
+            np.save(begin_file_name + '_val_loss.npy', all_losses_val) # save losses
 
-    print('saving model')
-    torch.save(rnn, file_name) # save model
-    np.save(begin_file_name + '_train_loss.npy', all_losses) # save losses
-    np.save(begin_file_name + '_val_loss.npy', all_losses_val) # save losses
+        print('\t%s %d %s %.4f' % ('epoch', epoch, 'val loss', val_loss))
+
+    if val_loss <= best_val_loss:  # only save if validation error is at its lowest
+        print('saving model')
+        torch.save(rnn, file_name) # save model
+        np.save(begin_file_name + '_train_loss.npy', all_losses) # save losses
+        np.save(begin_file_name + '_val_loss.npy', all_losses_val) # save losses
 
     # plot all losses
     plt.figure()
@@ -312,7 +324,7 @@ if __name__ == '__main__':
     elif(model_type=="GRU"):
         #global rnn
         rnn = GRU(n_letters, n_hidden, n_layers, n_categories)
-        file_name='GRU_model_sjuttifjarton.pt'
+        file_name='GRU_model_12.pt'
         title='GRU model'
     else:
         print('input: model type (either RNN or LSTM or GRU)')
