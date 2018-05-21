@@ -324,7 +324,7 @@ if __name__ == '__main__':
     elif(model_type=="GRU"):
         #global rnn
         rnn = GRU(n_letters, n_hidden, n_layers, n_categories)
-        file_name='GRU_model_12.pt'
+        file_name='GRU_model_15.pt'
         title='GRU model'
     else:
         print('input: model type (either RNN or LSTM or GRU)')
@@ -332,7 +332,7 @@ if __name__ == '__main__':
 
     # rnn=torch.load(file_name) # uncomment if you are continuing training an existing model
     rnn.optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
-    rnn.criterion = nn.NLLLoss(weight=class_weights)
+    rnn.criterion = nn.NLLLoss()
 
     train_model(title, file_name)
     #train_model_deterministic(title, file_name)
