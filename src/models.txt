@@ -17,6 +17,7 @@ GRU_model_12.pt 	GRU 				5000			1000		0.005			geonames		countries>300	128			no 	
 GRU_model_13.pt 	GRU 				5000			1000		0.001			geonames		countries>300	128			no 			yes 			2			yes
 GRU_model_8_Adam.pt GRU     20          1000            1000        0.005           geonames        countries>300	128         no 			yes				2			no                      
 model_8.pt 			RNN 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
+GRU_model_adagrad.pt GRU    1085000     5000            5000        0.005           geonames		countries>300	128			no 			yes				2			yes                        
 
 
 evaluation
@@ -38,6 +39,7 @@ GRU_model_10.pt 		 			0.25			26.7			29.2
 GRU_model_10_2.pt 		 			0.39			51				48.5
 GRU_model_11.pt 			
 GRU_model_8_Adam.pt                 0.081754        11.7            10.2                                                     
+GRU_model_adagrad.pt 257m           0.2319          24.5            26.0                                
 
 things that changed for each model:
 

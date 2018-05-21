@@ -5,7 +5,8 @@ import random
 import time
 import math
 from math import floor
-
+import matplotlib
+matplotlib.use('Agg')
 import copy
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -98,7 +99,7 @@ def train_model(title, file_name):
         # Print epoch number, loss, name and guess
         if epoch % print_every == 0:
             guess, guess_i = category_from_output(output)
-            correct = '✓' if guess == category else '✗ (%s)' % code_dict[category]
+            correct = 'yes' if guess == category else 'no (%s)' % code_dict[category]
             print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, epoch / n_epochs * 100, time_since(start), loss, line, code_dict[guess], correct))
 
             # just printing the sum of the weights to check that theyre not exploding or vanishing
@@ -156,7 +157,7 @@ def train_model(title, file_name):
     plt.xlabel('tot number of samples processed')
     plt.ylabel('cost')
     plt.show()
-
+    plt.savefig('plotloss.png')
 
 def train_model_deterministic(title, file_name):
 
@@ -203,7 +204,7 @@ def train_model_deterministic(title, file_name):
             # Print epoch number, loss, name and guess
             if num % print_every == 0:
                 guess, guess_i = category_from_output(output)
-                correct = '✓' if guess == category else '✗ (%s)' % code_dict[category]
+                correct = 'yes' if guess == category else 'no (%s)' % code_dict[category]
                 percent_done= totsamples / (tot_train * n_epochs)
                 print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, percent_done * 100, time_since(start), loss, line, code_dict[guess], correct))
 
@@ -261,7 +262,7 @@ def train_model_deterministic(title, file_name):
     plt.xlabel('tot number of samples processed')
     plt.ylabel('cost')
     plt.show()
-
+    plt.savefig('lossdet.png')
 
 def hp_optimization():
 
