@@ -177,9 +177,9 @@ def train_model_deterministic(title, file_name):
 
     m=re.search('([a-zA-Z0-9_]+).pt', file_name)
     begin_file_name=m.group(1)
-
+    patience=0
+    old_val_before_increasing=-1
     best_val_loss=1e4 # can define your own "best_val_loss" if you are continuing training a model
-
 
     for epoch in range(1, n_epochs + 1):
 
