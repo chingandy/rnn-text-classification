@@ -5,7 +5,7 @@ import random
 import time
 import math
 from math import floor
-
+from torch.optim.lr_scheduler import LambdaLR
 import copy
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -17,13 +17,15 @@ import re
 
 np.random.seed(0)
 
-n_hidden = 128
-n_epochs = 1630520
+n_hidden = 64
+n_epochs = 3261040
 print_every = 5000
 plot_every = 1000
-learning_rate = 0.01 # If you set this too high, it might explode. If too low, it might not learn
-save_every=10000
-n_layers=2
+learning_rate = 0.005 # If you set this too high, it might explode. If too low, it might not learn
+save_every=5000
+n_layers=3
+
+# 0.01, 0.005, 0.001, 0.0001
 
 def category_from_output(output):
     top_n, top_i = output.data.topk(1) # Tensor out of Variable with .data
@@ -84,13 +86,14 @@ def train_model(title, file_name):
     start = time.time()
     patience=0
     old_val_before_increasing=-1
-    best_val_loss=1e4 # can define your own "best_val_loss" if you are continuing training a model
+    best_val_loss=2.23 # can define your own "best_val_loss" if you are continuing training a model
 
     m=re.search('([a-zA-Z0-9_]+).pt', file_name)
     begin_file_name=m.group(1)
 
     for epoch in range(1, n_epochs + 1):
 
+        # print(epoch)
         category, line, category_tensor, line_tensor = random_training_pair(train_set)
         output, loss = rnn.train(category_tensor, line_tensor)
         current_loss += loss
@@ -324,14 +327,16 @@ if __name__ == '__main__':
     elif(model_type=="GRU"):
         #global rnn
         rnn = GRU(n_letters, n_hidden, n_layers, n_categories)
-        file_name='GRU_model_15.pt'
+        file_name='GRU_model_17.pt'
         title='GRU model'
     else:
         print('input: model type (either RNN or LSTM or GRU)')
         quit()
 
-    # rnn=torch.load(file_name) # uncomment if you are continuing training an existing model
+    # rnn=torch.load(file_name) # Runcomment if you are continuing training an existing model
     rnn.optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
+    # lam = lambda epoch: 0.95 ** (epoch/10000)
+    # rnn.scheduler=LambdaLR(rnn.optimizer, lr_lambda=lam)
     rnn.criterion = nn.NLLLoss()
 
     train_model(title, file_name)
