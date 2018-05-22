@@ -91,8 +91,8 @@ class RNN_LSTM(nn.Module):
 
         for i in range(line_tensor.size()[0]):
             output, hidden, cell = self(line_tensor[i], hidden, cell)
-        print("################  output: ", output.size())
-        print("################  category_tensor: ", category_tensor.size())
+        # print("################  output: ", output.size())
+        # print("################  category_tensor: ", category_tensor.size())
         loss = self.criterion(output, category_tensor)
         loss.backward()
         self.optimizer.step()
