@@ -1,5 +1,7 @@
 import csv
 import numpy as np
+import matplotlib
+matplotlib.use('Agg')
 
 import matplotlib.mlab as mlab
 import matplotlib.pyplot as plt

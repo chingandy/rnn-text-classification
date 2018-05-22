@@ -6,6 +6,8 @@ import time
 import math
 from math import floor
 from torch.optim.lr_scheduler import LambdaLR
+import matplotlib
+matplotlib.use('Agg')
 import copy
 import matplotlib.pyplot as plt
 import matplotlib.ticker as ticker
@@ -101,11 +103,11 @@ def train_model(title, file_name):
         # Print epoch number, loss, name and guess
         if epoch % print_every == 0:
             guess, guess_i = category_from_output(output)
-            correct = '✓' if guess == category else '✗ (%s)' % code_dict[category]
+            correct = 'yes' if guess == category else 'no (%s)' % code_dict[category]
             print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, epoch / n_epochs * 100, time_since(start), loss, line, code_dict[guess], correct))
 
             # just printing the sum of the weights to check that theyre not exploding or vanishing
-            print('\tweights', np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy())) 
+            print('\tweights', np.sum(rnn.i2o.weight.data.numpy()), np.sum(rnn.i2h.weight.data.numpy()))
         # Add current loss avg to list of losses
         if epoch % plot_every == 0:
             all_losses.append(current_loss / plot_every)
@@ -122,7 +124,7 @@ def train_model(title, file_name):
 
             val_loss=(val_loss/1000).data.numpy()
             all_losses_val.append(val_loss)
-            
+
             if val_loss < best_val_loss:
                 best_val_loss=val_loss
             print('\t%s %d %s %.4f' % ('epoch', epoch, 'val loss', val_loss))
@@ -159,7 +161,7 @@ def train_model(title, file_name):
     plt.xlabel('tot number of samples processed')
     plt.ylabel('cost')
     plt.show()
-
+    plt.savefig('plotloss.png')
 
 def train_model_deterministic(title, file_name):
 
@@ -206,13 +208,13 @@ def train_model_deterministic(title, file_name):
             # Print epoch number, loss, name and guess
             if num % print_every == 0:
                 guess, guess_i = category_from_output(output)
-                correct = '✓' if guess == category else '✗ (%s)' % code_dict[category]
+                correct = 'yes' if guess == category else 'no (%s)' % code_dict[category]
                 percent_done= totsamples / (tot_train * n_epochs)
                 print('%d %d%% (%s) %.4f %s / %s %s' % (epoch, percent_done * 100, time_since(start), loss, line, code_dict[guess], correct))
 
                 # just printing the sum of the weights to check that theyre not exploding or vanishing
-                print('\tweights', np.sum(rnn.i2o.weight.data.cpu().numpy()), np.sum(rnn.i2h.weight.data.cpu().numpy())) 
-        
+                print('\tweights', np.sum(rnn.i2o.weight.data.cpu().numpy()), np.sum(rnn.i2h.weight.data.cpu().numpy()))
+
             # Add current loss avg to list of losses
             if num % plot_every == 0:
                 all_losses.append(current_loss / plot_every)
@@ -231,7 +233,7 @@ def train_model_deterministic(title, file_name):
 
         if val_loss < best_val_loss:
             best_val_loss=val_loss
-    
+
         if len(all_losses_val) > 1 and val_loss > all_losses_val[-2]:
             patience+=1
             old_val_before_increasing=all_losses_val[-2]
@@ -264,7 +266,7 @@ def train_model_deterministic(title, file_name):
     plt.xlabel('tot number of samples processed')
     plt.ylabel('cost')
     plt.show()
-
+    plt.savefig('lossdet.png')
 
 def hp_optimization():
 
@@ -316,8 +318,8 @@ if __name__ == '__main__':
     print(model_type)
     if(model_type=="RNN"):
         #global rnn
-        rnn = RNN(n_letters, n_hidden, n_categories)
-        file_name='model_8.pt'
+        rnn = RNN(n_letters, n_hidden,n_layers, n_categories)
+        file_name='model.pt'
         title = 'RNN model'
     elif(model_type=='LSTM'):
         #global rnn

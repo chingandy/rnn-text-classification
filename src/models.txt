@@ -23,6 +23,7 @@ GRU_model_16.pt 	GRU 				5000			1000		0.01			geonames		countries>300	64			no 			
 GRU_model_8_Adam.pt GRU     20          1000            1000        0.005           geonames        countries>300	128         no 			yes				2			no 
 
 model_8.pt 			RNN 	20		 	1000			1000		0.005			geonames		countries>300	128			no 			yes				2			no
+GRU_model_adagrad.pt GRU    1085000     5000            5000        0.005           geonames		countries>300	128			no 			yes				2			yes                        
 
 
 evaluation
@@ -49,6 +50,7 @@ GRU_model_14.pt 	336m			0.23			30.09			30.09		-> meh
 GRU_model_15.pt 	67m				0.38			44.3			44.3		-> seems good to use 0.01 as a learning rate, goes quicker and gives OK results
 
 GRU_model_8_Adam.pt                 0.081754        11.7            10.2                                                     
+GRU_model_adagrad.pt 257m           0.2319          24.5            26.0                                
 
 things that changed for each model:
 

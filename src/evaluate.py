@@ -2,6 +2,8 @@ import torch
 from data import *
 from model import *
 from train import random_training_pair, category_from_output #, accuracy
+import matplotlib
+matplotlib.use('Agg')
 
 import matplotlib.ticker as ticker
 import sys
@@ -97,7 +99,8 @@ def confusion_matrix():
     ax.yaxis.set_major_locator(ticker.MultipleLocator(1))
 
     plt.show()
-
+    plt.savefig('latestcm.png')
+    
 def accuracy(curr_set):
     correct=0
     tot=0
@@ -138,7 +141,7 @@ if __name__ == '__main__':
         rnn = torch.load('LSTM_model.pt')
     elif(model_type=="GRU"):
         #global rnn
-        rnn = torch.load('grumodel.pt')
+        rnn = torch.load('GRU_model_sjuttifjarton.pt')
     else:
         print('input: model type (either RNN or LSTM or GRU)')
         quit()
