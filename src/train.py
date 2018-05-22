@@ -161,7 +161,7 @@ def train_model(title, file_name):
     plt.xlabel('tot number of samples processed')
     plt.ylabel('cost')
     plt.show()
-    plt.savefig('plotloss.png')
+    plt.savefig('adagradplotloss.png')
 
 def train_model_deterministic(title, file_name):
 
@@ -329,14 +329,14 @@ if __name__ == '__main__':
     elif(model_type=="GRU"):
         #global rnn
         rnn = GRU(n_letters, n_hidden, n_layers, n_categories)
-        file_name='GRU_model_17.pt'
+        file_name='adagradGRU_model.pt'
         title='GRU model'
     else:
         print('input: model type (either RNN or LSTM or GRU)')
         quit()
 
     # rnn=torch.load(file_name) # Runcomment if you are continuing training an existing model
-    rnn.optimizer = torch.optim.SGD(rnn.parameters(), lr=learning_rate)
+    rnn.optimizer = torch.optim.Adagrad(rnn.parameters(), lr=learning_rate)
     # lam = lambda epoch: 0.95 ** (epoch/10000)
     # rnn.scheduler=LambdaLR(rnn.optimizer, lr_lambda=lam)
     rnn.criterion = nn.NLLLoss()

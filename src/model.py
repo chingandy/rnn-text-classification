@@ -124,11 +124,11 @@ class GRU(nn.Module):
     def forward(self, input, hidden):
 
 
-        combined=torch.cat((input[0],hidden[0]),1);
+        # combined=torch.cat((input[0],hidden[0]),1);
 
         hidden, (hidden) = self.i2h(input, (hidden))
-        # combined=torch.cat((input[0],hidden[0]),1);
-        output = self.i2o(combined) 
+        combined=torch.cat((input[0],hidden[0]),1);
+        output = self.i2o(combined)
 
         output = self.softmax(output)
         return output, hidden
