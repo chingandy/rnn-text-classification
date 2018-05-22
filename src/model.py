@@ -115,17 +115,20 @@ class GRU(nn.Module):
 
         self.hidden_size = hidden_size
         self.n_layers = n_layers
-        self.i2h = nn.GRU(input_size, hidden_size, n_layers)
-        # self.i2h = nn.GRU(input_size, hidden_size, n_layers, dropout=.2)
+        # self.i2h = nn.GRU(input_size, hidden_size, n_layers)
+        self.i2h = nn.GRU(input_size, hidden_size, n_layers, dropout=.2)
         self.i2o = nn.Linear(input_size+hidden_size, output_size)
         self.i2h.weight=self.i2h.weight_ih_l0 # make it easier to print weights
         self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, input, hidden):
 
-        hidden, (hidden) = self.i2h(input, (hidden))
+
         combined=torch.cat((input[0],hidden[0]),1);
-        output = self.i2o(combined)
+
+        hidden, (hidden) = self.i2h(input, (hidden))
+        # combined=torch.cat((input[0],hidden[0]),1);
+        output = self.i2o(combined) 
 
         output = self.softmax(output)
         return output, hidden
@@ -145,6 +148,9 @@ class GRU(nn.Module):
         loss = self.criterion(output, category_tensor)
         loss.backward()
         self.optimizer.step()
+        # print(self.optimizer.param_groups[0]['lr'])
+        # self.scheduler.step()
+
 
         return output, loss.data
 
