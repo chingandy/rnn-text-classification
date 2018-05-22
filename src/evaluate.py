@@ -11,7 +11,7 @@ import math
 torch.nn.Module.dump_patches = True
 
 
-np.random.seed(0) 
+np.random.seed(0)
 
 #rnn=0
 
@@ -20,7 +20,7 @@ def avg_f1_score():
 
     # Keep track of correct guesses in a confusion matrix
     confusion = torch.zeros(n_categories, n_categories)
-    n_confusion = 10000 # how many samples will be looked at 
+    n_confusion = 10000 # how many samples will be looked at
 
     # Go through a bunch of examples and record which are correctly guessed
     for i in range(n_confusion):
@@ -52,7 +52,7 @@ def confusion_matrix():
 
     # Keep track of correct guesses in a confusion matrix
     confusion = torch.zeros(n_categories, n_categories)
-    n_confusion = 10000 # how many samples will be looked at 
+    n_confusion = 10000 # how many samples will be looked at
 
     # Go through a bunch of examples and record which are correctly guessed
     for i in range(n_confusion):
@@ -100,7 +100,7 @@ def confusion_matrix():
 
     plt.show()
     plt.savefig('latestcm.png')
-    
+
 def accuracy(curr_set):
     correct=0
     tot=0
@@ -141,7 +141,7 @@ if __name__ == '__main__':
         rnn = torch.load('LSTM_model.pt')
     elif(model_type=="GRU"):
         #global rnn
-        rnn = torch.load('GRU_model_sjuttifjarton.pt')
+        rnn = torch.load('adagradGRU_model.pt')
     else:
         print('input: model type (either RNN or LSTM or GRU)')
         quit()
