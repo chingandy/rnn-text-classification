@@ -20,7 +20,7 @@ import re
 np.random.seed(0)
 
 n_hidden = 64
-n_epochs = 3261040
+n_epochs = 1085000
 print_every = 5000
 plot_every = 1000
 learning_rate = 0.005 # If you set this too high, it might explode. If too low, it might not learn
@@ -88,7 +88,8 @@ def train_model(title, file_name):
     start = time.time()
     patience=0
     old_val_before_increasing=-1
-    best_val_loss=2.23 # can define your own "best_val_loss" if you are continuing training a model
+    #best_val_loss=2.23 # can define your own "best_val_loss" if you are continuing training a model
+    best_val_loss = 4
 
     m=re.search('([a-zA-Z0-9_]+).pt', file_name)
     begin_file_name=m.group(1)
@@ -319,7 +320,7 @@ if __name__ == '__main__':
     if(model_type=="RNN"):
         #global rnn
         rnn = RNN(n_letters, n_hidden,n_layers, n_categories)
-        file_name='model.pt'
+        file_name='model_RNN_latest.pt'
         title = 'RNN model'
     elif(model_type=='LSTM'):
         #global rnn

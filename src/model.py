@@ -71,7 +71,6 @@ class RNN_LSTM(nn.Module):
         self.softmax = nn.LogSoftmax(dim=1)
 
     def forward(self, input, hidden, cell):
-
         hidden, (hidden, cell) = self.i2h(input, (hidden, cell))
         combined=torch.cat((input[0],hidden[0]),1);
         # hidden, (hidden, cell) = self.i2h(torch.cat((input, hidden),2), (hidden, cell))
@@ -86,8 +85,9 @@ class RNN_LSTM(nn.Module):
         hidden = self.init_hidden()
         cell = self.init_hidden()
         self.optimizer.zero_grad()
-
+        print("############line_tensor.shape before: ", line_tensor.size())
         line_tensor.unsqueeze_(1) # make input 3-dimensional, with dimension sequence length x mini-batch size x input dimension
+        print("############line_tensor.shape after: ", line_tensor.size())
 
         for i in range(line_tensor.size()[0]):
             output, hidden, cell = self(line_tensor[i], hidden, cell)
